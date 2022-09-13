@@ -1,6 +1,7 @@
 #include <iostream>
 
-int main() {
+void testFunction() {
     std::cout << "Hello world\n";
-    return 0;
 }
+
+
