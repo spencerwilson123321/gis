@@ -1,7 +1,8 @@
 #include <iostream>
+#include "../include/Logger.h"
 
-void testFunction() {
-    std::cout << "Hello world\n";
-}
+Logger::Logger() {};
 
-
+void Logger::log(const char *message) {
+    std::cout << "Message: " << message << std::endl;
+};
