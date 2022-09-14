@@ -27,6 +27,7 @@ class CommandParser {
     public:
         CommandParser();
         Command parseCommand(std::string command);
+        std::vector<std::string> tokenizeCommand(std::string command);
 
 };
 

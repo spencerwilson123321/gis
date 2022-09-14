@@ -1,9 +1,8 @@
+#include <string>
 
 class Logger {
 
-    char *log_file_path;
-
     public:
-        void log(const char *message);
-
+        Logger();
+        void log(std::string message, std::string file_path);
 };

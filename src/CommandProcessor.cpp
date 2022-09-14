@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 Command::Command(CommandType type, std::vector<std::string> args) {
     Command::type = type;
@@ -17,9 +18,27 @@ Command CommandParser::parseCommand(std::string command) {
     // member to the corresponding type.
     // The rest of the words get placed into the Command objects args member.
     // Then, return the Command object.
-    std::vector<std::string> my_vector = {};
-    return Command(COMMENT, my_vector);
+    std::vector<std::string> tokens = tokenizeCommand(command);
+    for (std::string token : tokens) {
+        std::cout << token << std::endl;
+    }
+    return Command(COMMENT, tokens);
 }
+
+std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
+    std::vector<std::string> tokens{};
+    std::string temp = "";
+    for (int i = 0; i < command.length(); ++i) {
+        if (command[i] == ' ') {
+            tokens.push_back(temp);
+            temp = "";
+        } else {
+            temp.push_back(command[i]);
+        }
+    }
+    tokens.push_back(temp);
+    return tokens;
+};
 
 CommandProcessor::CommandProcessor() {};
 
