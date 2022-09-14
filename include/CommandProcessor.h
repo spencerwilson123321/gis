@@ -5,6 +5,7 @@
 enum CommandType {
     IMPORT,
     DEBUG,
+    WORLD,
     WHAT_IS_AT,
     WHAT_IS_IN,
     WHAT_IS,
@@ -15,11 +16,11 @@ enum CommandType {
 class Command {
 
     CommandType type;
-    std::vector<std::string> args;
+    std::vector<std::string> tokens;
 
     public:
         Command(CommandType type, std::vector<std::string> args);
-
+        void printCommand();
 };
 
 class CommandParser {
