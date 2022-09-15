@@ -3,10 +3,21 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <sstream>
 
 Command::Command(CommandType type, std::vector<std::string> tokens) {
     Command::type = type;
     Command::tokens = tokens;
+};
+
+std::string Command::getCommandString() {
+    std::ostringstream oss;
+    oss << Command::type << " ";
+    for (int i = 0; i < Command::tokens.size(); ++i) {
+        oss << tokens[i] << " ";
+    }
+    oss << "\n";
+    return oss.str();
 };
 
 void Command::printCommand() {
@@ -72,11 +83,20 @@ std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
     return tokens;
 };
 
+CommandProcessor::CommandProcessor(Logger log) {
+    CommandProcessor::logger = log;
+};
+
 CommandProcessor::CommandProcessor() {};
+
+void CommandProcessor::setLogger(Logger log) {
+    CommandProcessor::logger = log;
+};
 
 void CommandProcessor::processSingleCommand(std::string command_string) {
     Command command = parser.parseCommand(command_string);
-    command.printCommand(); 
+    logger.log(command.getCommandString());
+    // command.printCommand();
     // If command.type == A:
     //      do something (Perform some operation, and log it to the Logfile.)
     // else if command.type == B:

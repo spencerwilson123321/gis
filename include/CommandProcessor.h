@@ -21,6 +21,7 @@ class Command {
     public:
         Command(CommandType type, std::vector<std::string> args);
         void printCommand();
+        std::string getCommandString();
 };
 
 class CommandParser {
@@ -40,8 +41,10 @@ class CommandProcessor {
     void processSingleCommand(std::string command);
     
     public:
+        CommandProcessor(Logger logger);
         CommandProcessor();
         void processCommandFile(std::string file_path);
         void setCommandParser();
+        void setLogger(Logger logger);
 };
 

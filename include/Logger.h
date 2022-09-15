@@ -2,7 +2,10 @@
 
 class Logger {
 
+    std::string logFilePath;
+
     public:
         Logger();
-        void log(std::string message, std::string file_path);
+        Logger(std::string path);
+        void log(std::string message);
 };

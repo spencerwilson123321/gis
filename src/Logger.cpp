@@ -3,12 +3,21 @@
 #include <fstream>
 #include "../include/Logger.h"
 
+Logger::Logger(std::string path) {
+    Logger::logFilePath = path;
+    std::ofstream file(logFilePath);
+    if (file.is_open()) {
+        file << "";
+    }
+    file.close();
+};
+
 Logger::Logger() {};
 
-void Logger::log(std::string message, std::string file_path) {
-    std::ofstream file(file_path);
+void Logger::log(std::string message) {
+    std::ofstream file(logFilePath, std::ios::app);
     if (file.is_open()) {
-        file << "Log Message: " << message << std::endl;
+        file << "Log Message: " << message;
     }
     file.close();
 };
