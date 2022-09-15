@@ -10,6 +10,7 @@ Command::Command(CommandType type, std::vector<std::string> tokens) {
 };
 
 void Command::printCommand() {
+    std::cout << Command::type << " ";
     for (int i = 0; i < Command::tokens.size(); ++i) {
         std::cout << tokens[i] << " ";
     }
@@ -28,10 +29,13 @@ Command CommandParser::parseCommand(std::string command) {
     std::vector<std::string> tokens = tokenizeCommand(command);
     std::string first_token = tokens.at(0);
     if (first_token == ";") {
-        return Command(DEBUG, tokens);
+        return Command(COMMENT, tokens);
     }
     if (first_token == "debug") {
         return Command(DEBUG, tokens);
+    }
+    if (first_token == "import") {
+        return Command(IMPORT, tokens);
     }
     if (first_token == "world") {
         return Command(WORLD, tokens);
@@ -48,7 +52,9 @@ Command CommandParser::parseCommand(std::string command) {
     if (first_token == "quit") {
         return Command(QUIT, tokens);
     }
-    return Command(COMMENT, tokens);
+    // Doing this to avoid warning, but this should be fine. I think :D
+    // It is never reached.
+    return Command(COMMENT, tokens); 
 }
 
 std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
