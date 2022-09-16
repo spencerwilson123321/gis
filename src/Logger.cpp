@@ -17,8 +17,7 @@ Logger::Logger() {};
 void Logger::log(std::string message) {
     std::ofstream file(logFilePath, std::ios::app);
     if (file.is_open()) {
-        file << "Log Message: " << message;
+        file << message;
     }
     file.close();
 };
-
