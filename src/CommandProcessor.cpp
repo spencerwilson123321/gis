@@ -95,7 +95,6 @@ void CommandProcessor::setLogger(Logger log) {
 
 void CommandProcessor::processSingleCommand(std::string command_string) {
     Command command = parser.parseCommand(command_string);
-    
     logger.log(command.getCommandString());
     // command.printCommand();
     // If command.type == A:
