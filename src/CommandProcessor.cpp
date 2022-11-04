@@ -97,8 +97,8 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
     Command command = parser.parseCommand(command_string);
     logger.log(command.getCommandString());
     // command.printCommand();
-    // If command.type == A:
-    //      do something (Perform some operation, and log it to the Logfile.)
+    // If command.type == "world":
+    //      Parse coordinates.
     // else if command.type == B:
     //      do something else.
     // etc...

@@ -3,6 +3,7 @@
 #include <fstream>
 #include "../include/GISRecord.h"
 #include "../include/CommandProcessor.h"
+// #include "../include/Logger.h"
 
 int main(int argc, const char **argv) {
     // ./GIS <command file path> <log file path> <db file path>
@@ -18,4 +19,3 @@ int main(int argc, const char **argv) {
         exit(EXIT_FAILURE);
     }
 };
-
