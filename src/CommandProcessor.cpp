@@ -5,10 +5,12 @@
 #include <iterator>
 #include <sstream>
 
+
 Command::Command(CommandType type, std::vector<std::string> tokens) {
     Command::type = type;
     Command::tokens = tokens;
 };
+
 
 std::string Command::getCommandString() {
     std::ostringstream oss;
@@ -20,6 +22,12 @@ std::string Command::getCommandString() {
     return oss.str();
 };
 
+
+CommandType Command::getCommandType() {
+    return type;
+}
+
+
 void Command::printCommand() {
     std::cout << Command::type << " ";
     for (int i = 0; i < Command::tokens.size(); ++i) {
@@ -28,15 +36,11 @@ void Command::printCommand() {
     std::cout << "\n";
 };
 
+
 CommandParser::CommandParser() {};
 
+
 Command CommandParser::parseCommand(std::string command) {
-    // Read the string command, and tokenize it by splitting it by
-    // whitespace.
-    // Read the first word (the command), and set the Command objects type
-    // member to the corresponding type.
-    // The rest of the words get placed into the Command objects args member.
-    // Then, return the Command object.
     std::vector<std::string> tokens = tokenizeCommand(command);
     std::string first_token = tokens.at(0);
     if (first_token == ";") {
@@ -63,10 +67,9 @@ Command CommandParser::parseCommand(std::string command) {
     if (first_token == "quit") {
         return Command(QUIT, tokens);
     }
-    // Doing this to avoid warning, but this should be fine. I think :D
-    // It is never reached.
     return Command(COMMENT, tokens); 
 }
+
 
 std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
     std::vector<std::string> tokens{};
@@ -83,26 +86,39 @@ std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
     return tokens;
 };
 
+
 CommandProcessor::CommandProcessor(Logger log) {
     CommandProcessor::logger = log;
 };
 
+CommandProcessor::CommandProcessor(Logger log, DatabaseManager dbmgr) {
+    CommandProcessor::logger = log;
+    CommandProcessor::dbmgr = dbmgr;
+};
+
 CommandProcessor::CommandProcessor() {};
+
 
 void CommandProcessor::setLogger(Logger log) {
     CommandProcessor::logger = log;
 };
 
+
 void CommandProcessor::processSingleCommand(std::string command_string) {
     Command command = parser.parseCommand(command_string);
-    logger.log(command.getCommandString());
-    // command.printCommand();
-    // If command.type == "world":
-    //      Parse coordinates.
-    // else if command.type == B:
-    //      do something else.
-    // etc...
+    if (command.getCommandType() == WORLD) {
+        // 1. Convert the DMS coordinates into DD coordinates.
+        // 2. Set the DatabaseManager world coordinates.
+        CommandProcessor::dbmgr.setWestLong(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[1]));
+        CommandProcessor::dbmgr.setEastLong(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[2]));
+        CommandProcessor::dbmgr.setSouthLat(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[3]));
+        CommandProcessor::dbmgr.setNorthLat(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[4]));
+    } 
+    if (command.getCommandType() == COMMENT) {
+        logger.log(command.getCommandString());
+    }
 }
+
 
 void CommandProcessor::processCommandFile(std::string file_path) {
     // Open a file using the filename.

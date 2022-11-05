@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include "../include/Logger.h"
+#include "../include/DatabaseManager.h"
 
 enum CommandType {
     IMPORT,
@@ -15,13 +16,14 @@ enum CommandType {
 
 class Command {
 
-    CommandType type;
-    std::vector<std::string> tokens;
 
     public:
         Command(CommandType type, std::vector<std::string> args);
         void printCommand();
         std::string getCommandString();
+        CommandType getCommandType();
+        CommandType type;
+        std::vector<std::string> tokens;
 };
 
 class CommandParser {
@@ -37,10 +39,12 @@ class CommandProcessor {
     
     CommandParser parser;
     Logger logger;
+    DatabaseManager dbmgr;
     
     void processSingleCommand(std::string command);
     
     public:
+        CommandProcessor(Logger logger, DatabaseManager dbmgr);
         CommandProcessor(Logger logger);
         CommandProcessor();
         void processCommandFile(std::string file_path);
