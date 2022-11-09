@@ -8,8 +8,6 @@
 class DatabaseManager
 {
 private:
-
-    // More instance variables;
     std::string dbfilename;
     BufferPool pool;
 public:
