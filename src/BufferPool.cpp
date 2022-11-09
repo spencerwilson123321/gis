@@ -1,13 +1,12 @@
+#define BUFFERPOOL 1
 #include "../include/BufferPool.h"
-
 
 BufferPool::BufferPool() {
 
 };
 
-
-BufferPool::BufferPool(DatabaseManager& mgr) {
-    BufferPool::dbmgr = mgr; 
+BufferPool::BufferPool(std::string dbpath) {
+    BufferPool::dbpath = dbpath; 
 };
 
 bool BufferPool::isCached() {

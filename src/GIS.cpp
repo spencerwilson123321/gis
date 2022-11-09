@@ -1,23 +1,23 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#define GISRECORD 1
-#include "../include/GISRecord.h"
+
+#ifndef COMMANDPROCESSOR
 #include "../include/CommandProcessor.h"
-#include "../include/BufferPool.h"
+#endif
 
 int main(int argc, const char **argv) {
     // ./GIS <command file path> <log file path> <db file path>
     if (argc == 4) {
         std::string commandFilename(argv[1]);
-        std::string logFilename(argv[2]);
-        std::string dbFilename(argv[3]);
+        std::string logFilePath(argv[2]);
+        std::string dbFilePath(argv[3]);
 
         // Creating necessary objects
-        Logger logger(logFilename);
-        DatabaseManager dbmgr(dbFilename);
-        BufferPool bufferpool(dbmgr);
-        
+        Logger logger(logFilePath);
+        BufferPool bufferpool(dbFilePath);
+        DatabaseManager dbmgr(dbFilePath, bufferpool);
+
         // Command processor has references
         // to all these objects so that it can
         // dispatch the proper operations.

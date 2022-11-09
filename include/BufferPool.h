@@ -1,21 +1,14 @@
 #include <vector>
 #include <string>
 
-#ifndef GISRECORD
-#include "../include/GISRecord.h"
-#endif
-
-#ifndef DBMGR
-#include "../include/DatabaseManager.h"
-#endif
 
 class BufferPool {
     private:
-        DatabaseManager dbmgr;
         std::vector<std::string> cache;
+        std::string dbpath;
     public:
         BufferPool();
-        BufferPool(DatabaseManager& dbmgr);
+        BufferPool(std::string dbpath);
         bool isCached();
 };
 

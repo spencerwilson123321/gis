@@ -1,16 +1,21 @@
 #include <iostream>
 #include <string>
 
+#ifndef BUFFERPOOL
+#include "../include/BufferPool.h"
+#endif
+
 class DatabaseManager
 {
 private:
 
     // More instance variables;
     std::string dbfilename;
+    BufferPool pool;
 public:
     DatabaseManager();
     DatabaseManager(std::string dbfilename);
-    // float convertDMSToDD(std::string dms);
+    DatabaseManager(std::string dbfilename, BufferPool pool);
     int convertDMSToSeconds(std::string dms);
     void printWorldBoundaries();
     std::string getFilePath();

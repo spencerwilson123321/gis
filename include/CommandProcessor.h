@@ -1,8 +1,9 @@
 #include <string>
 #include <vector>
 #include "../include/Logger.h"
-#define DBMGR 1
+#ifndef DBMGR
 #include "../include/DatabaseManager.h"
+#endif
 
 enum CommandType {
     IMPORT,

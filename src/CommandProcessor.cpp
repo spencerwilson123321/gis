@@ -1,3 +1,4 @@
+#define COMMANDPROCESSOR 1
 #include "../include/CommandProcessor.h"
 #include <string>
 #include <fstream>
@@ -125,7 +126,6 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
     }
     if (command.getCommandType() == IMPORT) {
         std::cout << "Importing: " << command.tokens[1] << std::endl;
-        // The database manager will check if each record falls into valid world boundaries.
         CommandProcessor::dbmgr.importRecords(command.tokens[1]);
     }
     if (command.getCommandType() == QUIT) {

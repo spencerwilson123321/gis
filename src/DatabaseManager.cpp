@@ -1,7 +1,11 @@
+
+#define DBMGR 1
 #include "../include/DatabaseManager.h"
+
 #ifndef GISRECORD
 #include "../include/GISRecord.h"
 #endif
+
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
@@ -12,6 +16,11 @@ DatabaseManager::DatabaseManager() {};
 // Constructor
 DatabaseManager::DatabaseManager(std::string dbfilename) {
     DatabaseManager::dbfilename = dbfilename;
+}
+
+DatabaseManager::DatabaseManager(std::string dbfilename, BufferPool pool) {
+    DatabaseManager::dbfilename = dbfilename;
+    DatabaseManager::pool = pool;
 }
 
 void DatabaseManager::setWestLong(int val) {
