@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#define GISRECORD 1
 #include "../include/GISRecord.h"
 #include "../include/CommandProcessor.h"
+#include "../include/BufferPool.h"
 
 int main(int argc, const char **argv) {
     // ./GIS <command file path> <log file path> <db file path>
@@ -14,6 +16,7 @@ int main(int argc, const char **argv) {
         // Creating necessary objects
         Logger logger(logFilename);
         DatabaseManager dbmgr(dbFilename);
+        BufferPool bufferpool(dbmgr);
         
         // Command processor has references
         // to all these objects so that it can

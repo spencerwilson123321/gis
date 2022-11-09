@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include "../include/Logger.h"
+#define DBMGR 1
 #include "../include/DatabaseManager.h"
 
 enum CommandType {

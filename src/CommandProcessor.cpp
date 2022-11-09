@@ -5,6 +5,7 @@
 #include <iterator>
 #include <sstream>
 
+// ------------------------- COMMAND OBJECT ----------------------------
 
 Command::Command(CommandType type, std::vector<std::string> tokens) {
     Command::type = type;
@@ -36,6 +37,7 @@ void Command::printCommand() {
     std::cout << "\n";
 };
 
+// ---------------------- COMMAND PARSER ------------------------------
 
 CommandParser::CommandParser() {};
 
@@ -87,6 +89,9 @@ std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
 };
 
 
+// ---------------------- COMMAND PROCESSOR ------------------------------
+
+
 CommandProcessor::CommandProcessor(Logger log) {
     CommandProcessor::logger = log;
 };
@@ -107,15 +112,25 @@ void CommandProcessor::setLogger(Logger log) {
 void CommandProcessor::processSingleCommand(std::string command_string) {
     Command command = parser.parseCommand(command_string);
     if (command.getCommandType() == WORLD) {
-        // 1. Convert the DMS coordinates into DD coordinates.
+        // 1. Convert the DMS coordinates into seconds.
         // 2. Set the DatabaseManager world coordinates.
-        CommandProcessor::dbmgr.setWestLong(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[1]));
-        CommandProcessor::dbmgr.setEastLong(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[2]));
-        CommandProcessor::dbmgr.setSouthLat(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[3]));
-        CommandProcessor::dbmgr.setNorthLat(CommandProcessor::dbmgr.convertDMSToDD(command.tokens[4]));
+        CommandProcessor::dbmgr.setWestLong(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[1]));
+        CommandProcessor::dbmgr.setEastLong(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[2]));
+        CommandProcessor::dbmgr.setSouthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[3]));
+        CommandProcessor::dbmgr.setNorthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[4]));
+        CommandProcessor::dbmgr.printWorldBoundaries();
     } 
     if (command.getCommandType() == COMMENT) {
         logger.log(command.getCommandString());
+    }
+    if (command.getCommandType() == IMPORT) {
+        std::cout << "Importing: " << command.tokens[1] << std::endl;
+        // The database manager will check if each record falls into valid world boundaries.
+        CommandProcessor::dbmgr.importRecords(command.tokens[1]);
+    }
+    if (command.getCommandType() == QUIT) {
+        std::cout << "Exitting..." << std::endl;
+        exit(0);
     }
 }
 
