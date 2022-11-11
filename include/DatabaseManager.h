@@ -2,7 +2,13 @@
 #include <string>
 
 #ifndef BUFFERPOOL
+#define BUFFERPOOL
 #include "../include/BufferPool.h"
+#endif
+
+#ifndef NAMEINDEX
+#define NAMEINDEX
+#include "../include/NameIndex.h"
 #endif
 
 class DatabaseManager
@@ -10,12 +16,14 @@ class DatabaseManager
 private:
     std::string dbfilename;
     BufferPool pool;
+    Hashtable hash;
 public:
     DatabaseManager();
     DatabaseManager(std::string dbfilename);
     DatabaseManager(std::string dbfilename, BufferPool pool);
+    DatabaseManager(std::string dbfilename, BufferPool pool, Hashtable hash);
     int convertDMSToSeconds(std::string dms);
-    void printWorldBoundaries();
+    std::string stringWorldBoundaries();
     std::string getFilePath();
     bool importRecords(std::string path);
     void setWestLong(int val);
@@ -26,9 +34,9 @@ public:
     // These coordinates must be stored in Decimal Degrees (DD) format.
     // They are originally stored in DMS format so a conversion must take place
     // before these variables can be set.
-    float westLong;
-    float eastLong;
-    float southLat;
-    float northLat;
+    int westLong;
+    int eastLong;
+    int southLat;
+    int northLat;
 };
 

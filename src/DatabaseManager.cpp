@@ -1,51 +1,80 @@
 
-#define DBMGR 1
+#ifndef DBMGR
+#define DBMGR
 #include "../include/DatabaseManager.h"
+#endif
 
 #ifndef GISRECORD
+#define GISRECORD
 #include "../include/GISRecord.h"
+#endif
+
+#ifndef NAMEINDEX
+#define NAMEINDEX
+#include "../include/NameIndex.h"
 #endif
 
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
 
+
 // Empty constructor
 DatabaseManager::DatabaseManager() {};
+
 
 // Constructor
 DatabaseManager::DatabaseManager(std::string dbfilename) {
     DatabaseManager::dbfilename = dbfilename;
 }
 
+
 DatabaseManager::DatabaseManager(std::string dbfilename, BufferPool pool) {
     DatabaseManager::dbfilename = dbfilename;
     DatabaseManager::pool = pool;
 }
 
+
+DatabaseManager::DatabaseManager(std::string dbfilename, BufferPool pool, Hashtable hash) {
+    DatabaseManager::dbfilename = dbfilename;
+    DatabaseManager::pool = pool;
+    DatabaseManager::hash = hash;
+}
+
+
 void DatabaseManager::setWestLong(int val) {
     DatabaseManager::westLong = val;
 };
+
 
 void DatabaseManager::setEastLong(int val) {
     DatabaseManager::eastLong = val;
 };
 
+
 void DatabaseManager::setSouthLat(int val) {
     DatabaseManager::southLat = val;
 };
+
 
 void DatabaseManager::setNorthLat(int val) {
     DatabaseManager::northLat = val;
 };
 
 
-void DatabaseManager::printWorldBoundaries() {
-        std::cout << "World Coordinates:\n";
-        std::cout << "\t    " << DatabaseManager::northLat << std::endl;
-        std::cout << DatabaseManager::westLong << "\t\t\t" << DatabaseManager::eastLong << std::endl;
-        std::cout << "\t    " << DatabaseManager::southLat << std::endl;
+std::string DatabaseManager::stringWorldBoundaries() {
+    std::string result = "";
+    // result += "World Coordinates:\n";
+    result += "----------------------------------------------------------\n";
+    result += "World Boundaries\n";
+    result += "----------------------------------------------------------\n";
+    result += "\t    " + std::to_string(DatabaseManager::northLat) + "\n";
+    result += std::to_string(DatabaseManager::westLong) + "\t\t\t" + std::to_string(DatabaseManager::eastLong) + "\n";
+    result += "\t    " + std::to_string(DatabaseManager::southLat) + "\n";
+    result += "----------------------------------------------------------\n";
+    return result;
 };
+
 
 int DatabaseManager::convertDMSToSeconds(std::string dms) {
     int result = 0;
@@ -79,9 +108,11 @@ int DatabaseManager::convertDMSToSeconds(std::string dms) {
     return result;
 };
 
+
 std::string DatabaseManager::getFilePath() {
     return DatabaseManager::dbfilename;
 }
+
 
 bool DatabaseManager::importRecords(std::string path) {
     // 1. Open the database file in append mode.
@@ -90,9 +121,11 @@ bool DatabaseManager::importRecords(std::string path) {
     std::ifstream import_file;
     std::string buffer;
     std::string db_filepath = DatabaseManager::getFilePath();
+    DatabaseManager::hash.initializeTable(1024);
     database_file.open(db_filepath, std::ios::app);
     import_file.open(path, std::ios::in);
     int first_line = 1;
+    int offset = 0;
     if (import_file.is_open() && database_file.is_open()) {
         int numDroppedEntries = 0;
         int numAddedEntries = 0;
@@ -103,6 +136,11 @@ bool DatabaseManager::importRecords(std::string path) {
                 first_line = 0;
                 continue;
             }
+            // Calculate the file offset. This will
+            // be stored inside the Data Structures
+            // so that we can quickly retrieve them 
+            // from the database file.
+            offset += buffer.size();
             // 1. Convert buffer to GISRecord object.
             GISRecord record(buffer);
             // 2. Check that DMSLat and DMSLong are not equal to 0.
@@ -116,8 +154,19 @@ bool DatabaseManager::importRecords(std::string path) {
                     numAddedEntries += 1;
                     numInBounds += 1;
                     database_file << buffer << std::endl;
+                    // Now we must fill out the data structures.
+                    // 1. Fill out the hash table.
+                    if (record.featureName == "" || record.stateAlpha == "") {
+                        std::cout << "Missing feature name or state abbreviation!" << std::endl;
+                        import_file.close();
+                        database_file.close();
+                        exit(1);
+                    }
+                    std::string featureNamestateAbbreviation = record.featureName + record.stateAlpha;
+                    DatabaseManager::hash.insert(featureNamestateAbbreviation, offset);
                 } else {
                     numOutOfBounds += 1;
+                    numDroppedEntries += 1;
                 }
             } else {
                 // Ignore the entry if it is missing DMS coordinates.
@@ -128,7 +177,7 @@ bool DatabaseManager::importRecords(std::string path) {
         std::cout << "Number of added entries: " << numAddedEntries << std::endl;
         std::cout << "Number of Out-of-Bound entries: " << numOutOfBounds << std::endl;
         std::cout << "Number of In-Bound entries: " << numInBounds << std::endl;
-    } 
+    }
     import_file.close();
     database_file.close();
     return true;

@@ -1,6 +1,8 @@
 #include <iostream>
-#define GISRECORD 1
+#ifndef GISRECORD
+#define GISRECORD 
 #include "../include/GISRecord.h"
+#endif
 #include <stdlib.h>
 
 std::vector<std::string> GISRecord::splitEntry(std::string entry) {

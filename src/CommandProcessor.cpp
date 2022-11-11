@@ -16,8 +16,7 @@ Command::Command(CommandType type, std::vector<std::string> tokens) {
 
 std::string Command::getCommandString() {
     std::ostringstream oss;
-    oss << Command::type << " ";
-    for (int i = 0; i < Command::tokens.size(); ++i) {
+    for (int i = 0; i < Command::tokens.size(); i++) {
         oss << tokens[i] << " ";
     }
     oss << "\n";
@@ -119,7 +118,9 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         CommandProcessor::dbmgr.setEastLong(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[2]));
         CommandProcessor::dbmgr.setSouthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[3]));
         CommandProcessor::dbmgr.setNorthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[4]));
-        CommandProcessor::dbmgr.printWorldBoundaries();
+        std::string output = CommandProcessor::dbmgr.stringWorldBoundaries();
+        logger.log(command.getCommandString());
+        logger.log(output);
     } 
     if (command.getCommandType() == COMMENT) {
         logger.log(command.getCommandString());
