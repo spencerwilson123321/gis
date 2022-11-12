@@ -74,6 +74,9 @@ void Hashtable::collisionFunction(std::string key, int value) {
 
 std::string Hashtable::debug() {
     std::string output = "";
+    output += "Number of elements in the hash table: " + std::to_string(numOccupied) + "\n";
+    output += "Current table size: " + std::to_string(buckets.size()) + "\n";
+    output += "Format of the display is: Index | Record\n";
     for (int i = 0; i < buckets.size(); i++) {
         if (bucketStatus[i] == OCCUPIED) {
             output += std::to_string(i) + "| ";

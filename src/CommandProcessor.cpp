@@ -6,6 +6,13 @@
 #include <iterator>
 #include <sstream>
 
+// ------------------------- STRING CONSTANTS --------------------------
+
+std::string DEBUG_HASH = "hash";
+std::string DEBUG_WORLD = "world";
+std::string DEBUG_QUAD = "quad";
+
+
 // ------------------------- COMMAND OBJECT ----------------------------
 
 Command::Command(CommandType type, std::vector<std::string> tokens) {
@@ -132,7 +139,15 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
     }
     if (command.getCommandType() == DEBUG) {
         logger.log(command.getCommandString());
-        logger.log(CommandProcessor::dbmgr.debugHash());
+        if (command.tokens[1] == DEBUG_HASH) {
+            logger.log(CommandProcessor::dbmgr.debugHash());
+        }
+        if (command.tokens[1] == DEBUG_WORLD) {
+            logger.log("Not implemented.\n");
+        }
+        if (command.tokens[1] == DEBUG_QUAD) {
+            logger.log("Not implemented.\n");
+        }
     }
     if (command.getCommandType() == QUIT) {
         logger.log(command.getCommandString());
