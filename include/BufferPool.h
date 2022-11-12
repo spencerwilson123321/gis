@@ -29,14 +29,17 @@ class CacheEntry {
 
 class BufferPool {
     private:
+        int numEntries;
         std::list<CacheEntry> cache;
         std::string dbpath;
     public:
         BufferPool();
         BufferPool(std::string);
         std::string checkCache(int offset);
+        void addEntryToCache(CacheEntry entry);
         void updateCache(CacheEntry entry);
         GISRecord retrieveRecord(int offset);
         std::string readFromDatabase(int offset);
         std::string debugPool();
 };
+

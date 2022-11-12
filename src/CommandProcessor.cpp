@@ -150,11 +150,10 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
             logger.log("Not implemented.\n");
         }
         if (command.tokens[1] == DEBUG_POOL) {
-            logger.log("Not implemented.\n");
+            logger.log(CommandProcessor::dbmgr.debugPool());
         }
     }
     if (command.getCommandType() == WHAT_IS) {
-        logger.log(command.getCommandString());
         std::string featureName = "";
         int i = 1;
         for (i; i < command.tokens.size()-1; i++) {
@@ -166,6 +165,8 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         };
         std::string input = featureName + ":" + command.tokens[i+1];
         std::string output = CommandProcessor::dbmgr.what_is(input);
+        logger.log(command.getCommandString());
+        logger.log(output);
     }
     if (command.getCommandType() == QUIT) {
         logger.log(command.getCommandString());

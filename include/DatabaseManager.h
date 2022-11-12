@@ -31,6 +31,7 @@ public:
     void setSouthLat(int val);
     void setNorthLat(int val);
     std::string debugHash();
+    std::string debugPool();
     // The database manager needs to know the world coordinates.
     // These coordinates must be stored in Decimal Degrees (DD) format.
     // They are originally stored in DMS format so a conversion must take place

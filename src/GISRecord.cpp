@@ -94,8 +94,6 @@ GISRecord::GISRecord() {};
 
 // Constructor
 GISRecord::GISRecord(std::string entry) {
-    GISRecord::parseEntry(entry);
+    parseEntry(entry);
 };
-
-
 

@@ -116,11 +116,15 @@ std::string DatabaseManager::debugHash() {
     return DatabaseManager::hash.debug();
 }
 
+std::string DatabaseManager::debugPool() {
+    return DatabaseManager::pool.debugPool();
+}
+
 std::string DatabaseManager::what_is(std::string key) {
     // 1. Retrieve the file offset from the hash table.
     int offset = DatabaseManager::hash.get(key);
     if (offset == -1) {
-        return "Not found!";
+        return "Not found!\n";
     }
     GISRecord record = DatabaseManager::pool.retrieveRecord(offset);
     std::string output = "";
@@ -153,13 +157,14 @@ std::string DatabaseManager::importRecords(std::string path) {
         while (std::getline(import_file, buffer)) {
             if (first_line) {
                 first_line = 0;
+                offset += 1;
                 continue;
             }
             // Calculate the file offset. This will
             // be stored inside the Data Structures
             // so that we can quickly retrieve them 
             // from the database file.
-            offset += buffer.size();
+            // offset += buffer.size();
             // 1. Convert buffer to GISRecord object.
             GISRecord record(buffer);
             // 2. Check that DMSLat and DMSLong are not equal to 0.
@@ -191,6 +196,7 @@ std::string DatabaseManager::importRecords(std::string path) {
                 // Ignore the entry if it is missing DMS coordinates.
                 numDroppedEntries += 1;
             }
+            offset += 1;
         }
         output += "Number of dropped entries: " + std::to_string(numDroppedEntries) + "\n";
         output += "Number of added entries: " + std::to_string(numAddedEntries) + "\n";
