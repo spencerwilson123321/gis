@@ -16,6 +16,7 @@ public:
     std::string debug();
 
     bool search(std::string key);
+    int get(std::string key); // Get a file offset given key.
     void add(std::string key, int value);
     void remove(std::string key);
     void rehash();

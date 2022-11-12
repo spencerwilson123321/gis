@@ -12,7 +12,7 @@ BufferPool::BufferPool(std::string dbpath) {
     BufferPool::dbpath = dbpath;
 };
 
-void BufferPool::updateCache() {
+void BufferPool::updateCache(CacheEntry entry) {
     // This will insert the given CacheEntry object at
     // the front of the cache.
 }
@@ -34,6 +34,9 @@ GISRecord BufferPool::retrieveRecord(int offset) {
     if (entry != "") {
         return GISRecord(entry);
     }
-    return GISRecord("");
+    entry = BufferPool::readFromDatabase(offset);
+    CacheEntry ce(offset, entry);
+    updateCache(ce);
+    return GISRecord(entry);
 };
 

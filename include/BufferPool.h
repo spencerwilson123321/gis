@@ -16,27 +16,13 @@ class CacheEntry {
             offset = o;
             entry = e;
         }
-
         CacheEntry() {
         }
-};
-
-
-class Node {
-    public:
-        CacheEntry value;
-        Node* next;
-        Node* prev;
-        Node() {
-            value = CacheEntry();
-            next = nullptr;
-            prev = nullptr;
-        }
-
-        Node(CacheEntry value, Node* n, Node *p) {
-            value = value;
-            next = n;
-            prev = p;
+        bool isEmpty() {
+            if (entry == "") {
+                return true;
+            }
+            return false;
         }
 };
 
@@ -49,7 +35,8 @@ class BufferPool {
         BufferPool();
         BufferPool(std::string);
         std::string checkCache(int offset);
-        void updateCache();
+        void updateCache(CacheEntry entry);
         GISRecord retrieveRecord(int offset);
+        std::string readFromDatabase(int offset);
         std::string debugPool();
 };

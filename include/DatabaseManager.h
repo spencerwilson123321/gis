@@ -25,6 +25,7 @@ public:
     std::string stringWorldBoundaries();
     std::string getFilePath();
     std::string importRecords(std::string path);
+    std::string what_is(std::string input);
     void setWestLong(int val);
     void setEastLong(int val);
     void setSouthLat(int val);

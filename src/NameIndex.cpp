@@ -179,6 +179,58 @@ bool Hashtable::search(std::string key) {
     return false;
 };
 
+int Hashtable::get(std::string key) {
+    unsigned int index = hashFunction(key);
+    if (bucketStatus[index] == OCCUPIED) {
+        // The element might be in the wrong position due to probing.
+        if (buckets[index].first == key) {
+            // Found it.
+            return buckets[index].second;
+        // If the key doesn't match. Then check quadratically
+        // for the next position.
+        // If we find a position 
+        } else {
+            int n = 1;
+            int alpha = 0;
+            while (true) {
+                alpha = ((n*n)+n)/2;
+                alpha = (index + alpha) % buckets.size();
+                if (bucketStatus[alpha] == EMPTY) {
+                    // If this bucket is truly empty, then the value won't be in the list.
+                    return -1;
+                }
+                if (bucketStatus[alpha] == OCCUPIED && buckets[alpha].first == key) {
+                    return -1;
+                }
+                n = n + 1;
+            }
+        }
+    }
+    if (bucketStatus[index] == EMPTY) {
+        return -1;
+    }
+    if (bucketStatus[index] == DELETED) {
+        if (buckets[index].first == key) {
+            return -1;
+        }
+        int n = 1;
+        int alpha = 0;
+        while (true) {
+            alpha = ((n*n)+n)/2;
+            alpha = (index + alpha) % buckets.size();
+            if (bucketStatus[alpha] == EMPTY) {
+                // If this bucket is truly empty, then the value won't be in the list.
+                return -1;
+            }
+            if (bucketStatus[alpha] == OCCUPIED && buckets[alpha].first == key) {
+                return buckets[alpha].second;
+            }
+            n = n + 1;
+        }
+    }
+    return -1;
+};
+
 
 void Hashtable::remove(std::string key) {
     unsigned int index = hashFunction(key);

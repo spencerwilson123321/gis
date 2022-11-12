@@ -116,6 +116,21 @@ std::string DatabaseManager::debugHash() {
     return DatabaseManager::hash.debug();
 }
 
+std::string DatabaseManager::what_is(std::string key) {
+    // 1. Retrieve the file offset from the hash table.
+    int offset = DatabaseManager::hash.get(key);
+    if (offset == -1) {
+        return "Not found!";
+    }
+    GISRecord record = DatabaseManager::pool.retrieveRecord(offset);
+    std::string output = "";
+    output += std::to_string(offset)+ ": ";
+    output += record.countyName + " (";
+    output += std::to_string(record.primaryLatitudeDMS) + " seconds, ";
+    output += std::to_string(record.primaryLongitudeDMS) + " seconds)\n";
+    return output;
+}
+
 
 std::string DatabaseManager::importRecords(std::string path) {
     // 1. Open the database file in append mode.

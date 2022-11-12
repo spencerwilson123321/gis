@@ -11,6 +11,7 @@
 std::string DEBUG_HASH = "hash";
 std::string DEBUG_WORLD = "world";
 std::string DEBUG_QUAD = "quad";
+std::string DEBUG_POOL = "pool";
 
 
 // ------------------------- COMMAND OBJECT ----------------------------
@@ -128,7 +129,7 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         std::string output = CommandProcessor::dbmgr.stringWorldBoundaries();
         logger.log(command.getCommandString());
         logger.log(output);
-    } 
+    }
     if (command.getCommandType() == COMMENT) {
         logger.log(command.getCommandString());
     }
@@ -148,6 +149,23 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         if (command.tokens[1] == DEBUG_QUAD) {
             logger.log("Not implemented.\n");
         }
+        if (command.tokens[1] == DEBUG_POOL) {
+            logger.log("Not implemented.\n");
+        }
+    }
+    if (command.getCommandType() == WHAT_IS) {
+        logger.log(command.getCommandString());
+        std::string featureName = "";
+        int i = 1;
+        for (i; i < command.tokens.size()-1; i++) {
+            if (i == command.tokens.size()-2) {
+                featureName += command.tokens[i];
+                break;
+            }
+            featureName += command.tokens[i] + " ";
+        };
+        std::string input = featureName + ":" + command.tokens[i+1];
+        std::string output = CommandProcessor::dbmgr.what_is(input);
     }
     if (command.getCommandType() == QUIT) {
         logger.log(command.getCommandString());
