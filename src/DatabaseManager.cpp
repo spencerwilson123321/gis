@@ -121,7 +121,7 @@ std::string DatabaseManager::importRecords(std::string path) {
     std::string buffer;
     std::string output = "";
     std::string db_filepath = DatabaseManager::getFilePath();
-    DatabaseManager::hash.initializeTable(1024);
+    DatabaseManager::hash.initializeTable(20);
     database_file.open(db_filepath, std::ios::app);
     import_file.open(path, std::ios::in);
     int first_line = 1;
