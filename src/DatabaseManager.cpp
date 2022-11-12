@@ -64,7 +64,6 @@ void DatabaseManager::setNorthLat(int val) {
 
 std::string DatabaseManager::stringWorldBoundaries() {
     std::string result = "";
-    // result += "World Coordinates:\n";
     result += "----------------------------------------------------------\n";
     result += "World Boundaries\n";
     result += "----------------------------------------------------------\n";
@@ -114,12 +113,13 @@ std::string DatabaseManager::getFilePath() {
 }
 
 
-bool DatabaseManager::importRecords(std::string path) {
+std::string DatabaseManager::importRecords(std::string path) {
     // 1. Open the database file in append mode.
     // 2. Open the import file in read mode.
     std::ofstream database_file;
     std::ifstream import_file;
     std::string buffer;
+    std::string output = "";
     std::string db_filepath = DatabaseManager::getFilePath();
     DatabaseManager::hash.initializeTable(1024);
     database_file.open(db_filepath, std::ios::app);
@@ -163,7 +163,7 @@ bool DatabaseManager::importRecords(std::string path) {
                         exit(1);
                     }
                     std::string featureNamestateAbbreviation = record.featureName + record.stateAlpha;
-                    DatabaseManager::hash.insert(featureNamestateAbbreviation, offset);
+                    DatabaseManager::hash.add(featureNamestateAbbreviation, offset);
                 } else {
                     numOutOfBounds += 1;
                     numDroppedEntries += 1;
@@ -173,14 +173,15 @@ bool DatabaseManager::importRecords(std::string path) {
                 numDroppedEntries += 1;
             }
         }
-        std::cout << "Number of dropped entries: " << numDroppedEntries << std::endl;
-        std::cout << "Number of added entries: " << numAddedEntries << std::endl;
-        std::cout << "Number of Out-of-Bound entries: " << numOutOfBounds << std::endl;
-        std::cout << "Number of In-Bound entries: " << numInBounds << std::endl;
+        output += "Number of dropped entries: " + std::to_string(numDroppedEntries) + "\n";
+        output += "Number of added entries: " + std::to_string(numAddedEntries) + "\n";
+        output += "Number of Out-of-Bound entries: " + std::to_string(numOutOfBounds) + "\n";
+        output += "Number of In-Bound entries: " + std::to_string(numInBounds) + "\n";
     }
     import_file.close();
     database_file.close();
-    return true;
+    // DatabaseManager::hash.debug();
+    return output;
 }
 
 

@@ -11,8 +11,7 @@
 #include "../include/NameIndex.h"
 #endif
 
-class DatabaseManager
-{
+class DatabaseManager {
 private:
     std::string dbfilename;
     BufferPool pool;
@@ -25,7 +24,7 @@ public:
     int convertDMSToSeconds(std::string dms);
     std::string stringWorldBoundaries();
     std::string getFilePath();
-    bool importRecords(std::string path);
+    std::string importRecords(std::string path);
     void setWestLong(int val);
     void setEastLong(int val);
     void setSouthLat(int val);
@@ -39,4 +38,3 @@ public:
     int southLat;
     int northLat;
 };
-

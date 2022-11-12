@@ -126,11 +126,13 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         logger.log(command.getCommandString());
     }
     if (command.getCommandType() == IMPORT) {
-        std::cout << "Importing: " << command.tokens[1] << std::endl;
-        CommandProcessor::dbmgr.importRecords(command.tokens[1]);
+        logger.log(command.getCommandString());
+        std::string output = CommandProcessor::dbmgr.importRecords(command.tokens[1]);
+        logger.log(output);
     }
     if (command.getCommandType() == QUIT) {
-        std::cout << "Exitting..." << std::endl;
+        logger.log(command.getCommandString());
+        logger.log("Quitting...");
         exit(0);
     }
 }
