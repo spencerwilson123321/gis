@@ -112,6 +112,10 @@ std::string DatabaseManager::getFilePath() {
     return DatabaseManager::dbfilename;
 }
 
+std::string DatabaseManager::debugHash() {
+    return DatabaseManager::hash.debug();
+}
+
 
 std::string DatabaseManager::importRecords(std::string path) {
     // 1. Open the database file in append mode.
@@ -121,7 +125,7 @@ std::string DatabaseManager::importRecords(std::string path) {
     std::string buffer;
     std::string output = "";
     std::string db_filepath = DatabaseManager::getFilePath();
-    DatabaseManager::hash.initializeTable(20);
+    DatabaseManager::hash.initializeTable(1024);
     database_file.open(db_filepath, std::ios::app);
     import_file.open(path, std::ios::in);
     int first_line = 1;
@@ -162,7 +166,7 @@ std::string DatabaseManager::importRecords(std::string path) {
                         database_file.close();
                         exit(1);
                     }
-                    std::string featureNamestateAbbreviation = record.featureName + record.stateAlpha;
+                    std::string featureNamestateAbbreviation = record.featureName + ":" + record.stateAlpha;
                     DatabaseManager::hash.add(featureNamestateAbbreviation, offset);
                 } else {
                     numOutOfBounds += 1;

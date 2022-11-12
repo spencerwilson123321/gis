@@ -72,17 +72,16 @@ void Hashtable::collisionFunction(std::string key, int value) {
 }
 
 
-void Hashtable::debug() {
-    int test = 0;
+std::string Hashtable::debug() {
+    std::string output = "";
     for (int i = 0; i < buckets.size(); i++) {
         if (bucketStatus[i] == OCCUPIED) {
-            test += 1;
-            // std::cout << "Index: " << i << std::endl;
-            // std::cout << "Key: " << "'" << buckets[i].first << "'" << std::endl;
-            // std::cout << "Value: " << buckets[i].second << std::endl;
+            output += std::to_string(i) + "| ";
+            output += "'" + buckets[i].first + "' [";
+            output += std::to_string(buckets[i].second) + "]\n";
         }
     }
-    std::cout << "Actual Num Occupied: " << test << std::endl;
+    return output;
 }
 
 

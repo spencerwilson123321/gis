@@ -130,6 +130,10 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         std::string output = CommandProcessor::dbmgr.importRecords(command.tokens[1]);
         logger.log(output);
     }
+    if (command.getCommandType() == DEBUG) {
+        logger.log(command.getCommandString());
+        logger.log(CommandProcessor::dbmgr.debugHash());
+    }
     if (command.getCommandType() == QUIT) {
         logger.log(command.getCommandString());
         logger.log("Quitting...");

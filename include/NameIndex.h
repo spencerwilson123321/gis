@@ -13,7 +13,7 @@ public:
     Hashtable();
     
     void initializeTable(int n);
-    void debug();
+    std::string debug();
 
     bool search(std::string key);
     void add(std::string key, int value);
