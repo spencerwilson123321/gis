@@ -33,6 +33,7 @@ public:
     std::string getFilePath();
     std::string importRecords(std::string path);
     std::string what_is(std::string input);
+    std::string what_is_at(int latitude, int longitude);
     void setWestLong(int val);
     void setEastLong(int val);
     void setSouthLat(int val);

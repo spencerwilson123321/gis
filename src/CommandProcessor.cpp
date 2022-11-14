@@ -169,6 +169,13 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         logger.log(command.getCommandString());
         logger.log(output);
     }
+    if (command.getCommandType() == WHAT_IS_AT) {
+        int latitude, longitude;
+        latitude = dbmgr.convertDMSToSeconds(command.tokens[1]);
+        longitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
+        logger.log(command.getCommandString());
+        logger.log(dbmgr.what_is_at(latitude, longitude));
+    }
     if (command.getCommandType() == QUIT) {
         logger.log(command.getCommandString());
         logger.log("Quitting...");

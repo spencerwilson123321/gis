@@ -144,6 +144,19 @@ std::string DatabaseManager::what_is(std::string key) {
     return output;
 }
 
+std::string DatabaseManager::what_is_at(int latitude, int longitude) {
+    std::string output = "";
+    Coordinate coords(latitude, longitude);
+    std::vector<int> offsets = quad.search(quad.root, coords);
+    if (offsets.size() == 0) {
+        output += "No records found!\n";
+    }
+    for (int offset : offsets) {
+        auto record = pool.retrieveRecord(offset);
+        output += std::to_string(offset) + " | " + "'" + record.featureName + "'" + " " + "'" + record.countyName + "'" + " " + "'" + record.stateAlpha + "'\n";
+    }
+    return output;
+}
 
 std::string DatabaseManager::importRecords(std::string path) {
     // 1. Open the database file in append mode.
