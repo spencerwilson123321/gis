@@ -206,17 +206,20 @@ bool BucketQuadTree::empty() {
     return root == nullptr;
 };
 
-std::string BucketQuadTree::treeToString(Node* node, int rootHeight) {
+std::string BucketQuadTree::treeToString(Node* node, std::string prefix) {
     std::string output = "";
-    int height = calculateHeight(node);
-    if (height == rootHeight) {
-        // Printing the root node.
-        output += (node->bucketNode ? "!" : "@");        
+    if (node == nullptr) return output;
+    std::string value = (node->bucketNode ? "B" : "N");
+    output += prefix + value + "\n";
+    if (node->bucketNode) {
+        for (auto pair : node->bucket) {
+            output += prefix + " Lat: " + std::to_string(pair.first.latitude) + " Long: " + std::to_string(pair.first.longitude) + " File Offset: " + std::to_string(pair.second) + "\n";
+        }
     }
-    treeToString(node->NW, rootHeight);
-    treeToString(node->NE, rootHeight);
-    treeToString(node->SW, rootHeight);
-    treeToString(node->SE, rootHeight);
+    output += treeToString(node->NW, prefix+"   ");
+    output += treeToString(node->NE, prefix+"   ");
+    output += treeToString(node->SW, prefix+"   ");
+    output += treeToString(node->SE, prefix+"   ");
     return output;
 }
 
@@ -227,10 +230,10 @@ std::string BucketQuadTree::debug() {
     output += "Number of Elements out of bounds: " + std::to_string(numOutOfBounds) + "\n";
     output += "Height of the Quad Tree: " + std::to_string(height) + "\n";
     output += "Legend:\n";
-    output += "@ = non-bucket node\n";
-    output += "! = bucket node\n";
+    output += "N = non-bucket node\n";
+    output += "B = bucket node\n";
     output += "-------------------------------------------------------------------------\n";
-    // output += treeToString(root, height) + "\n";
+    output += treeToString(root, " ");
     output += "-------------------------------------------------------------------------\n";
     return output;
 }

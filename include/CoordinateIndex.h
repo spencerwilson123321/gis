@@ -41,7 +41,7 @@ class BucketQuadTree {
         bool isBucketNode(Node *node);
         void makeQuadrants(Node* node);
         void setBoundaries(Node *node, int w, int e, int n, int s);
-        std::string treeToString(Node *node, int rootHeight);
+        std::string treeToString(Node *node, std::string prefix);
         std::string debug();
 };
 
