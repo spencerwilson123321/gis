@@ -34,6 +34,7 @@ class BucketQuadTree {
         void setRootBoundaries(int, int, int, int);
         void insert(Node* node, Coordinate coords, int offset);
         std::vector<int> search(Node *node, Coordinate coords);
+        std::vector<int> searchRegion(Node* node, Coordinate coordinate, int halfHeight, int halfWidth);
         void erase(Node *node, Coordinate coords, int offset);
         bool empty();
         bool inBounds(Node* node, Coordinate coordinate);

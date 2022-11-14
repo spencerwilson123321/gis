@@ -202,6 +202,38 @@ std::vector<int> BucketQuadTree::search(Node* node, Coordinate coord) {
     return offsets;
 };
 
+
+std::vector<int> BucketQuadTree::searchRegion(Node* node, Coordinate coord, int halfHeight, int halfWidth) {
+    std::vector<int> offsets;
+    if (!inBounds(node, coord)) {
+        return offsets;
+    }
+    if (isBucketNode(node)) {
+        // Check if there are coordinates matching our search coordinates.
+        for (auto pair : node->bucket) {
+            if (pair.first.latitude == coord.latitude && pair.first.longitude == coord.longitude) {
+                offsets.push_back(pair.second);
+            }
+        }
+        return offsets;
+    } else {
+        if (inBounds(node->NW, coord)) {
+            return search(node->NW, coord);
+        }
+        if (inBounds(node->NE, coord)) {
+            return search(node->NE, coord);
+        }
+        if (inBounds(node->SW, coord)) {
+            return search(node->SW, coord);
+        }
+        if (inBounds(node->SE, coord)) {
+            return search(node->SE, coord);
+        }
+    }
+    return offsets;
+};
+
+
 bool BucketQuadTree::empty() {
     return root == nullptr;
 };

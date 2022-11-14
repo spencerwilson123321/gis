@@ -34,6 +34,7 @@ public:
     std::string importRecords(std::string path);
     std::string what_is(std::string input);
     std::string what_is_at(int latitude, int longitude);
+    std::string what_is_in(int latitude, int longitude, int halfHeight, int halfWidth, int longFlag, int filterFlag, std::string filterString);
     void setWestLong(int val);
     void setEastLong(int val);
     void setSouthLat(int val);

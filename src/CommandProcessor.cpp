@@ -180,6 +180,40 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         logger.log(dbmgr.what_is_at(latitude, longitude));
     }
+    if (command.getCommandType() == WHAT_IS_IN) {
+        // Need to parse the command.
+        int filterFlag = 0;
+        int longFlag = 0;
+        std::string filterString = "";
+        int latitude = 0;
+        int longitude = 0;
+        int halfHeight = 0;
+        int halfWidth = 0;
+        // Check if the first token is one of -filter or -long
+        if (command.tokens[1] == "-long") {
+            longFlag = 1;
+            int latitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
+            int longitude = dbmgr.convertDMSToSeconds(command.tokens[3]);
+            int halfHeight = std::stoi(command.tokens[4]);
+            int halfWidth = std::stoi(command.tokens[5]);
+        }
+        if (command.tokens[1] == "-filter") {
+            filterFlag = 1;
+            filterString = command.tokens[2];
+            int latitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
+            int longitude = dbmgr.convertDMSToSeconds(command.tokens[3]);
+            int halfHeight = std::stoi(command.tokens[4]);
+            int halfWidth = std::stoi(command.tokens[5]);
+        }
+        if (filterFlag == 0 && longFlag == 0) {
+            int latitude = dbmgr.convertDMSToSeconds(command.tokens[1]);
+            int longitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
+            int halfHeight = std::stoi(command.tokens[3]);
+            int halfWidth = std::stoi(command.tokens[4]);
+        }
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log(dbmgr.what_is_in(latitude, longitude, halfHeight, halfWidth, longFlag, filterFlag, filterString));
+    }
     if (command.getCommandType() == QUIT) {
         logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         logger.log("Quitting...");

@@ -158,6 +158,22 @@ std::string DatabaseManager::what_is_at(int latitude, int longitude) {
     return output;
 }
 
+std::string DatabaseManager::what_is_in(int latitude, int longitude, int halfHeight, int halfWidth, int longFlag, int filterFlag, std::string filterString) {
+    std::string output = "";
+    if (longFlag) {
+        output += "This one has the long flag!\n";
+    }
+    if (filterFlag) {
+        output += "This one has the filter flag!\n";
+        output += "This is the filter string: " + filterString + "\n";
+    }
+    if (!longFlag && !filterFlag) {
+        output += "This one is just regular!\n";
+    }
+    return output;
+};
+
+
 std::string DatabaseManager::importRecords(std::string path) {
     // 1. Open the database file in append mode.
     // 2. Open the import file in read mode.
