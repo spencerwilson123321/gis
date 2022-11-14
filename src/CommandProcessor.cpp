@@ -102,14 +102,18 @@ std::vector<std::string> CommandParser::tokenizeCommand(std::string command) {
 
 CommandProcessor::CommandProcessor(Logger log) {
     CommandProcessor::logger = log;
+    commandNumber = 1;
 };
 
 CommandProcessor::CommandProcessor(Logger log, DatabaseManager dbmgr) {
     CommandProcessor::logger = log;
     CommandProcessor::dbmgr = dbmgr;
+    commandNumber = 1;
 };
 
-CommandProcessor::CommandProcessor() {};
+CommandProcessor::CommandProcessor() {
+    commandNumber = 1;
+};
 
 
 void CommandProcessor::setLogger(Logger log) {
@@ -135,12 +139,12 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         logger.log(command.getCommandString());
     }
     if (command.getCommandType() == IMPORT) {
-        logger.log(command.getCommandString());
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         std::string output = CommandProcessor::dbmgr.importRecords(command.tokens[1]);
         logger.log(output);
     }
     if (command.getCommandType() == DEBUG) {
-        logger.log(command.getCommandString());
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         if (command.tokens[1] == DEBUG_HASH) {
             logger.log(CommandProcessor::dbmgr.debugHash());
         }
@@ -166,20 +170,23 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         };
         std::string input = featureName + ":" + command.tokens[i+1];
         std::string output = CommandProcessor::dbmgr.what_is(input);
-        logger.log(command.getCommandString());
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         logger.log(output);
     }
     if (command.getCommandType() == WHAT_IS_AT) {
         int latitude, longitude;
         latitude = dbmgr.convertDMSToSeconds(command.tokens[1]);
         longitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
-        logger.log(command.getCommandString());
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         logger.log(dbmgr.what_is_at(latitude, longitude));
     }
     if (command.getCommandType() == QUIT) {
-        logger.log(command.getCommandString());
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
         logger.log("Quitting...");
         exit(0);
+    }
+    if (command.getCommandType() != WORLD && command.getCommandType() != COMMENT) {
+        commandNumber += 1;
     }
 }
 

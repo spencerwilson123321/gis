@@ -43,6 +43,7 @@ class CommandProcessor {
     CommandParser parser;
     Logger logger;
     DatabaseManager dbmgr;
+    int commandNumber;
     
     void processSingleCommand(std::string command);
     
