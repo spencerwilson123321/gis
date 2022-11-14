@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <ctime>
 
 #ifndef COMMANDPROCESSOR
 #include "../include/CommandProcessor.h"
@@ -12,6 +13,19 @@ int main(int argc, const char **argv) {
         std::string commandFilename(argv[1]);
         std::string logFilePath(argv[2]);
         std::string dbFilePath(argv[3]);
+        char timeBuffer[1024];
+        // std::string timeBuffer;
+        time_t curr_time;
+        tm* curr_tm;
+        time(&curr_time);
+        curr_tm = localtime(&curr_time);
+        std::strftime(timeBuffer, 100, "%c", curr_tm);
+        std::string student_info = "Final Project for COMP 8042\n";
+        student_info += "Student Name: Spencer Wilson, Student ID: A01032190\n";
+        student_info += "Database File: " + dbFilePath + "\n";
+        student_info += "Script File: " + commandFilename + "\n";
+        student_info += "Log File: " + logFilePath + "\n";
+        student_info += "Start Time: " + std::string(timeBuffer) + "\n";
 
         // Creating necessary objects
         Logger logger(logFilePath);
@@ -24,6 +38,8 @@ int main(int argc, const char **argv) {
         // to all these objects so that it can
         // dispatch the proper operations.
         CommandProcessor cmdProcessor(logger, dbmgr);
+        // Log student information first.
+        logger.log(student_info);
         cmdProcessor.processCommandFile(commandFilename);
         exit(EXIT_SUCCESS);
     } else {
