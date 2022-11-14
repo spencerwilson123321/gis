@@ -11,16 +11,23 @@
 #include "../include/NameIndex.h"
 #endif
 
+#ifndef COORDINATEINDEX
+#define COORDINATEINDEX
+#include "../include/CoordinateIndex.h"
+#endif
+
 class DatabaseManager {
 private:
     std::string dbfilename;
     BufferPool pool;
     Hashtable hash;
+    BucketQuadTree quad;
 public:
     DatabaseManager();
     DatabaseManager(std::string dbfilename);
     DatabaseManager(std::string dbfilename, BufferPool pool);
-    DatabaseManager(std::string dbfilename, BufferPool pool, Hashtable hash);
+    DatabaseManager(std::string dbfilename, BufferPool pool, Hashtable hash, BucketQuadTree quad);
+    void setInitialQuadTreeBoundaries();
     int convertDMSToSeconds(std::string dms);
     std::string stringWorldBoundaries();
     std::string getFilePath();
@@ -32,6 +39,7 @@ public:
     void setNorthLat(int val);
     std::string debugHash();
     std::string debugPool();
+    std::string debugQuad();
     // The database manager needs to know the world coordinates.
     // These coordinates must be stored in Decimal Degrees (DD) format.
     // They are originally stored in DMS format so a conversion must take place

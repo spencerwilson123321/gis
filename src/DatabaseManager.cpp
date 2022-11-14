@@ -26,40 +26,45 @@ DatabaseManager::DatabaseManager() {};
 // Constructor
 DatabaseManager::DatabaseManager(std::string dbfilename) {
     DatabaseManager::dbfilename = dbfilename;
-}
+};
 
 
 DatabaseManager::DatabaseManager(std::string dbfilename, BufferPool pool) {
     DatabaseManager::dbfilename = dbfilename;
     DatabaseManager::pool = pool;
-}
+};
 
 
-DatabaseManager::DatabaseManager(std::string dbfilename, BufferPool pool, Hashtable hash) {
+DatabaseManager::DatabaseManager(std::string dbfilename, BufferPool pool, Hashtable hash, BucketQuadTree tree) {
     DatabaseManager::dbfilename = dbfilename;
     DatabaseManager::pool = pool;
     DatabaseManager::hash = hash;
-}
+    DatabaseManager::quad = tree;
+};
 
 
 void DatabaseManager::setWestLong(int val) {
-    DatabaseManager::westLong = val;
+    westLong = val;
 };
 
 
 void DatabaseManager::setEastLong(int val) {
-    DatabaseManager::eastLong = val;
+    eastLong = val;
 };
 
 
 void DatabaseManager::setSouthLat(int val) {
-    DatabaseManager::southLat = val;
+    southLat = val;
 };
 
 
 void DatabaseManager::setNorthLat(int val) {
-    DatabaseManager::northLat = val;
+    northLat = val;
 };
+
+void DatabaseManager::setInitialQuadTreeBoundaries() {
+    quad.setRootBoundaries(westLong, eastLong, northLat, southLat);
+}
 
 
 std::string DatabaseManager::stringWorldBoundaries() {
@@ -118,6 +123,10 @@ std::string DatabaseManager::debugHash() {
 
 std::string DatabaseManager::debugPool() {
     return DatabaseManager::pool.debugPool();
+}
+
+std::string DatabaseManager::debugQuad() {
+    return quad.debug();
 }
 
 std::string DatabaseManager::what_is(std::string key) {
@@ -187,7 +196,9 @@ std::string DatabaseManager::importRecords(std::string path) {
                         exit(1);
                     }
                     std::string featureNamestateAbbreviation = record.featureName + ":" + record.stateAlpha;
-                    DatabaseManager::hash.add(featureNamestateAbbreviation, offset);
+                    hash.add(featureNamestateAbbreviation, offset);
+                    Coordinate coords(record.primaryLatitudeDMS, record.primaryLongitudeDMS);
+                    quad.insert(quad.root, coords, offset);
                 } else {
                     numOutOfBounds += 1;
                     numDroppedEntries += 1;

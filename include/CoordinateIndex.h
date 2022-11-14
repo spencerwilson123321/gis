@@ -1,35 +1,47 @@
 #include <string>
 #include <vector>
 
-
-class QuadTreeNode {
+class Coordinate {
     public:
-        bool bucketNode;
-        int bucketSize;
-        int eastLatitude; // Expressed in seconds.
-        int westLatitude; // Expressed in seconds.
-        int northLongitude; // Expressed in seconds.
-        int southLongitude; // Expressed in seconds.
-        std::vector<int> bucket;
-        QuadTreeNode* NW;
-        QuadTreeNode* NE;
-        QuadTreeNode* SW;
-        QuadTreeNode* SE;
-        QuadTreeNode(int eastLat, int westLat, int northLong, int southLong, int bucketSize);
+        int latitude;
+        int longitude;
+        Coordinate(int latitude, int longitude);
 };
 
+struct Node {
+    Node(): bucketNode(true), NW(nullptr), NE(nullptr), SW(nullptr), SE(nullptr) {};
+    bool bucketNode;
+    int eastLongitude; // Expressed in seconds.
+    int westLongitude; // Expressed in seconds.
+    int northLatitude; // Expressed in seconds.
+    int southLatitude; // Expressed in seconds.
+    std::vector<std::pair<Coordinate, int>> bucket;
+    Node* NW;
+    Node* NE;
+    Node* SW;
+    Node* SE;
+};
 
 class BucketQuadTree {
     private:
-        QuadTreeNode* root;
-        int nodeBucketSize;
     public:
-    BucketQuadTree();
-    BucketQuadTree(QuadTreeNode* root);
-    BucketQuadTree(QuadTreeNode* root, int size);
-    void insert(int latitude, int longitude, int offset);
-    void search(int latitude, int longitude);
-    void erase(int latitude, int longitude, int offset);
-    bool empty();
+        Node* root;
+        int nodeBucketSize;
+        int numInsertions;
+        int numOutOfBounds;
+        BucketQuadTree(Node* node);
+        BucketQuadTree();
+        void setRootBoundaries(int, int, int, int);
+        void insert(Node* node, Coordinate coords, int offset);
+        std::vector<int> search(Node *node, Coordinate coords);
+        void erase(Node *node, Coordinate coords, int offset);
+        bool empty();
+        bool inBounds(Node* node, Coordinate coordinate);
+        bool isBucketFull(Node* node);
+        bool isBucketNode(Node *node);
+        void makeQuadrants(Node* node);
+        void setBoundaries(Node *node, int w, int e, int n, int s);
+        std::string treeToString(Node *node, int rootHeight);
+        std::string debug();
 };
 

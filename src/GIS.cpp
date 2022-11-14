@@ -16,8 +16,10 @@ int main(int argc, const char **argv) {
         // Creating necessary objects
         Logger logger(logFilePath);
         BufferPool bufferpool(dbFilePath);
-        DatabaseManager dbmgr(dbFilePath, bufferpool);
-
+        Node node;
+        BucketQuadTree tree(&node);
+        Hashtable hash;
+        DatabaseManager dbmgr(dbFilePath, bufferpool, hash, tree);
         // Command processor has references
         // to all these objects so that it can
         // dispatch the proper operations.

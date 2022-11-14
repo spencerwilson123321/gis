@@ -126,6 +126,7 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         CommandProcessor::dbmgr.setEastLong(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[2]));
         CommandProcessor::dbmgr.setSouthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[3]));
         CommandProcessor::dbmgr.setNorthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[4]));
+        CommandProcessor::dbmgr.setInitialQuadTreeBoundaries();
         std::string output = CommandProcessor::dbmgr.stringWorldBoundaries();
         logger.log(command.getCommandString());
         logger.log(output);
@@ -147,10 +148,10 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
             logger.log("Not implemented.\n");
         }
         if (command.tokens[1] == DEBUG_QUAD) {
-            logger.log("Not implemented.\n");
+            logger.log(dbmgr.debugQuad());
         }
         if (command.tokens[1] == DEBUG_POOL) {
-            logger.log(CommandProcessor::dbmgr.debugPool());
+            logger.log(dbmgr.debugPool());
         }
     }
     if (command.getCommandType() == WHAT_IS) {
