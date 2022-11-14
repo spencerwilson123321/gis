@@ -38,8 +38,10 @@ class BucketQuadTree {
         void erase(Node *node, Coordinate coords, int offset);
         bool empty();
         bool inBounds(Node* node, Coordinate coordinate);
+        bool inBoundsRegion(Coordinate topRight, Coordinate topLeft, Coordinate botRight, Coordinate botLeft, Coordinate coordinate);
         bool isBucketFull(Node* node);
         bool isBucketNode(Node *node);
+        bool checkIfOverlap(Node* node, Coordinate topRight, Coordinate topLeft, Coordinate botRight, Coordinate botLeft);
         void makeQuadrants(Node* node);
         void setBoundaries(Node *node, int w, int e, int n, int s);
         std::string treeToString(Node *node, std::string prefix);

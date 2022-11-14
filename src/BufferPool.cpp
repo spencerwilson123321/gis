@@ -42,6 +42,10 @@ GISRecord BufferPool::retrieveRecord(int offset) {
         return record;
     }
     entry = BufferPool::readFromDatabase(offset);
+    if (entry == "") {
+        std::cout << "BufferPool::readFromDatabase() returned an empty string\n";
+        exit(1);
+    }
     GISRecord record(entry);
     return record;
 };
@@ -77,13 +81,20 @@ std::string BufferPool::readFromDatabase(int offset) {
     db.open(BufferPool::dbpath, std::ios::in);
     if (!db.is_open()) {
         // Open file failed.
-        return "";
+        std::cout << "Open database file failed.\n";
+        exit(1);
     }
     db.seekg(db.beg);
-    for (int i = 0; i < offset-1; ++i) {
+    for (int i = 0; i < offset-2; ++i) {
         db.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
     }
     std::getline(db, entry);
+    if (entry == "") {
+        std::cout << "std::getline returned an empty string!\n";
+        std::cout << "Tried to read from line: " << offset << std::endl;
+        db.close();
+        exit(1);
+    }
     db.close();
     CacheEntry cacheEntry(offset, entry);
     addEntryToCache(cacheEntry);

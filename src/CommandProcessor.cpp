@@ -132,30 +132,38 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         CommandProcessor::dbmgr.setNorthLat(CommandProcessor::dbmgr.convertDMSToSeconds(command.tokens[4]));
         CommandProcessor::dbmgr.setInitialQuadTreeBoundaries();
         std::string output = CommandProcessor::dbmgr.stringWorldBoundaries();
-        logger.log(command.getCommandString());
+        logger.log(command.getCommandString()+"\n");
         logger.log(output);
     }
     if (command.getCommandType() == COMMENT) {
         logger.log(command.getCommandString());
     }
     if (command.getCommandType() == IMPORT) {
-        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log("---------------------------------------------------------------------------\n");
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString()+"\n");
         std::string output = CommandProcessor::dbmgr.importRecords(command.tokens[1]);
         logger.log(output);
+        logger.log("---------------------------------------------------------------------------\n");
     }
     if (command.getCommandType() == DEBUG) {
-        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log("---------------------------------------------------------------------------\n");
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString()+"\n");
         if (command.tokens[1] == DEBUG_HASH) {
             logger.log(CommandProcessor::dbmgr.debugHash());
+            logger.log("---------------------------------------------------------------------------\n");
         }
         if (command.tokens[1] == DEBUG_WORLD) {
             logger.log("Not implemented.\n");
+            logger.log("---------------------------------------------------------------------------\n");
         }
         if (command.tokens[1] == DEBUG_QUAD) {
             logger.log(dbmgr.debugQuad());
+            logger.log("---------------------------------------------------------------------------\n");
         }
+    
         if (command.tokens[1] == DEBUG_POOL) {
             logger.log(dbmgr.debugPool());
+            logger.log("---------------------------------------------------------------------------\n");
         }
     }
     if (command.getCommandType() == WHAT_IS) {
@@ -170,21 +178,25 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         };
         std::string input = featureName + ":" + command.tokens[i+1];
         std::string output = CommandProcessor::dbmgr.what_is(input);
-        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log("---------------------------------------------------------------------------\n");
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString()+"\n");
         logger.log(output);
+        logger.log("---------------------------------------------------------------------------\n");
     }
     if (command.getCommandType() == WHAT_IS_AT) {
         int latitude, longitude;
         latitude = dbmgr.convertDMSToSeconds(command.tokens[1]);
         longitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
-        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log("---------------------------------------------------------------------------\n");
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString()+"\n");
         logger.log(dbmgr.what_is_at(latitude, longitude));
+        logger.log("---------------------------------------------------------------------------\n");
     }
     if (command.getCommandType() == WHAT_IS_IN) {
         // Need to parse the command.
         int filterFlag = 0;
         int longFlag = 0;
-        std::string filterString = "";
+        std::string filterString;
         int latitude = 0;
         int longitude = 0;
         int halfHeight = 0;
@@ -192,31 +204,35 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
         // Check if the first token is one of -filter or -long
         if (command.tokens[1] == "-long") {
             longFlag = 1;
-            int latitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
-            int longitude = dbmgr.convertDMSToSeconds(command.tokens[3]);
-            int halfHeight = std::stoi(command.tokens[4]);
-            int halfWidth = std::stoi(command.tokens[5]);
+            latitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
+            longitude = dbmgr.convertDMSToSeconds(command.tokens[3]);
+            halfHeight = std::stoi(command.tokens[4]);
+            halfWidth = std::stoi(command.tokens[5]);
         }
         if (command.tokens[1] == "-filter") {
             filterFlag = 1;
             filterString = command.tokens[2];
-            int latitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
-            int longitude = dbmgr.convertDMSToSeconds(command.tokens[3]);
-            int halfHeight = std::stoi(command.tokens[4]);
-            int halfWidth = std::stoi(command.tokens[5]);
+            latitude = dbmgr.convertDMSToSeconds(command.tokens[3]);
+            longitude = dbmgr.convertDMSToSeconds(command.tokens[4]);
+            halfHeight = std::stoi(command.tokens[5]);
+            halfWidth = std::stoi(command.tokens[6]);
         }
         if (filterFlag == 0 && longFlag == 0) {
-            int latitude = dbmgr.convertDMSToSeconds(command.tokens[1]);
-            int longitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
-            int halfHeight = std::stoi(command.tokens[3]);
-            int halfWidth = std::stoi(command.tokens[4]);
+            latitude = dbmgr.convertDMSToSeconds(command.tokens[1]);
+            longitude = dbmgr.convertDMSToSeconds(command.tokens[2]);
+            halfHeight = std::stoi(command.tokens[3]);
+            halfWidth = std::stoi(command.tokens[4]);
         }
-        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log("---------------------------------------------------------------------------\n");
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString() + "\n");
         logger.log(dbmgr.what_is_in(latitude, longitude, halfHeight, halfWidth, longFlag, filterFlag, filterString));
+        logger.log("---------------------------------------------------------------------------\n");
     }
     if (command.getCommandType() == QUIT) {
-        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString());
+        logger.log("---------------------------------------------------------------------------\n");
+        logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString()+"\n");
         logger.log("Quitting...");
+        logger.log("---------------------------------------------------------------------------\n");
         exit(0);
     }
     if (command.getCommandType() != WORLD && command.getCommandType() != COMMENT) {

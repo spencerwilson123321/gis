@@ -202,32 +202,86 @@ std::vector<int> BucketQuadTree::search(Node* node, Coordinate coord) {
     return offsets;
 };
 
+// TODO
+bool BucketQuadTree::inBoundsRegion(Coordinate topRight, Coordinate topLeft, Coordinate botRight, Coordinate botLeft, Coordinate coordinate) {
+    int northLat = topRight.latitude;
+    int southLat = botRight.latitude;
+    int eastLat = topRight.longitude;
+    int westLat = topLeft.longitude;
+    return (coordinate.latitude >= southLat
+         && coordinate.latitude <= northLat
+         && coordinate.longitude >= westLat
+         && coordinate.longitude <= eastLat);
+}
+
+bool BucketQuadTree::checkIfOverlap(Node* node, Coordinate topRight, Coordinate topLeft, Coordinate botRight, Coordinate botLeft) {
+    int northLat = topRight.latitude;
+    int southLat = botRight.latitude;
+    int eastLong = topRight.longitude;
+    int westLong = topLeft.longitude;
+    // std::cout << "Region North Lat: " << northLat << std::endl;
+    // std::cout << "Region South Lat: " << southLat << std::endl;
+    // std::cout << "Region East Long: " << eastLong << std::endl;
+    // std::cout << "Region West Long: " << westLong << std::endl;
+    // std::cout << "Node North Lat: " << node->northLatitude << std::endl;
+    // std::cout << "Node South Lat: " << node->southLatitude << std::endl;
+    // std::cout << "Node East Long: " << node->eastLongitude << std::endl;
+    // std::cout << "Node West Long: " << node->westLongitude << std::endl;
+    return (node->northLatitude >= southLat
+         && node->southLatitude <= northLat
+         && node->eastLongitude >= westLong
+         && node->westLongitude <= eastLong);
+}
+
 
 std::vector<int> BucketQuadTree::searchRegion(Node* node, Coordinate coord, int halfHeight, int halfWidth) {
     std::vector<int> offsets;
-    if (!inBounds(node, coord)) {
+    std::vector<int> result;
+    // The four corners of the region search:
+    // Idea: If a region search overlaps a subquadrant in the coordinate space then one of it's corners must be within
+    // that quadrants bounds.
+    Coordinate topLeft(coord.latitude+halfHeight, coord.longitude-halfWidth);
+    Coordinate topRight(coord.latitude+halfHeight, coord.longitude+halfWidth);
+    Coordinate botLeft(coord.latitude-halfHeight, coord.longitude-halfWidth);
+    Coordinate botRight(coord.latitude-halfHeight, coord.longitude+halfWidth);
+
+    if (node == nullptr) {
         return offsets;
     }
+
+    if (!checkIfOverlap(node, topRight, topLeft, botRight, botLeft)) {
+        // The region being searched does not overlap with the current node, so return nothing.
+        // Nothing is found.
+        return offsets;
+    }
+
     if (isBucketNode(node)) {
-        // Check if there are coordinates matching our search coordinates.
+        // If this is a bucket node, and one of the corners is in this region.
+        // Then we need to add all offsets that are within the bounds
+        // of the region being searched.
         for (auto pair : node->bucket) {
-            if (pair.first.latitude == coord.latitude && pair.first.longitude == coord.longitude) {
+            if (inBoundsRegion(topRight, topLeft, botRight, botLeft, pair.first)) {
                 offsets.push_back(pair.second);
             }
         }
         return offsets;
     } else {
-        if (inBounds(node->NW, coord)) {
-            return search(node->NW, coord);
+        // Recursively search the tree.
+        result = searchRegion(node->NW, coord, halfHeight, halfWidth);
+        if (result.size() != 0) {
+            offsets.insert(offsets.end(), result.begin(), result.end());
         }
-        if (inBounds(node->NE, coord)) {
-            return search(node->NE, coord);
+        result = searchRegion(node->NE, coord, halfHeight, halfWidth);
+        if (result.size() != 0) {
+            offsets.insert(offsets.end(), result.begin(), result.end());
         }
-        if (inBounds(node->SW, coord)) {
-            return search(node->SW, coord);
+        result = searchRegion(node->SW, coord, halfHeight, halfWidth);
+        if (result.size() != 0) {
+            offsets.insert(offsets.end(), result.begin(), result.end());
         }
-        if (inBounds(node->SE, coord)) {
-            return search(node->SE, coord);
+        result = searchRegion(node->SE, coord, halfHeight, halfWidth);
+        if (result.size() != 0) {
+            offsets.insert(offsets.end(), result.begin(), result.end());
         }
     }
     return offsets;

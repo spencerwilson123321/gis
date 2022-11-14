@@ -61,8 +61,8 @@ float GISRecord::validateDD(std::string dd) {
 void GISRecord::parseEntry(std::string entry) {
 
     std::vector<std::string> tokens = GISRecord::splitEntry(entry);
-    
-    GISRecord::featureId = std::stoi(tokens[0]);
+
+    GISRecord::featureId = std::stoi(tokens[0]); // This is crashing.
     GISRecord::featureName = tokens[1];
     GISRecord::featureClass = tokens[2];
     GISRecord::stateAlpha = tokens[3];
@@ -94,6 +94,10 @@ GISRecord::GISRecord() {};
 
 // Constructor
 GISRecord::GISRecord(std::string entry) {
+    if (entry == "") {
+        std::cout << "GISRecord:GISRecord received an empty string\n";
+        exit(1);
+    }
     parseEntry(entry);
 };
 

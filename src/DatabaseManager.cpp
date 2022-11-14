@@ -17,6 +17,8 @@
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
+#include <string>
+#include <sstream>
 
 
 // Empty constructor
@@ -160,15 +162,14 @@ std::string DatabaseManager::what_is_at(int latitude, int longitude) {
 
 std::string DatabaseManager::what_is_in(int latitude, int longitude, int halfHeight, int halfWidth, int longFlag, int filterFlag, std::string filterString) {
     std::string output = "";
-    if (longFlag) {
-        output += "This one has the long flag!\n";
+    Coordinate coord(latitude, longitude);
+    std::vector<int> offsets = quad.searchRegion(quad.root, coord, halfHeight, halfWidth);
+    for (int offset : offsets) {
+        auto record = pool.retrieveRecord(offset);
+        output += record.featureName + " " + record.stateAlpha + " Lat: " + std::to_string(record.primaryLatitudeDMS) + " Long: " + std::to_string(record.primaryLongitudeDMS) + "\n";
     }
-    if (filterFlag) {
-        output += "This one has the filter flag!\n";
-        output += "This is the filter string: " + filterString + "\n";
-    }
-    if (!longFlag && !filterFlag) {
-        output += "This one is just regular!\n";
+    if (offsets.size() == 0) {
+        output += "No records found!\n";
     }
     return output;
 };
@@ -245,7 +246,23 @@ std::string DatabaseManager::importRecords(std::string path) {
     }
     import_file.close();
     database_file.close();
-    // DatabaseManager::hash.debug();
+    // There is a bug where the newline at the end of the database file crashes
+    // the program. To make sure that doesn't happen we have to read the database file again.
+    // and remove the newline at the end.
+    std::ifstream fileIn(db_filepath);
+    std::stringstream streamBuffer;
+    std::string contents;
+    if (!fileIn.is_open()) {
+        std::cout << "Failed to open database file when trying to remove trailing newline.\n";
+        exit(1);
+    };
+    streamBuffer << fileIn.rdbuf();
+    contents = streamBuffer.str();
+    contents.pop_back();
+    fileIn.close();
+    std::ofstream fileOut(db_filepath, std::ios::trunc);
+    fileOut << contents;
+    fileOut.close();
     return output;
 }
 
