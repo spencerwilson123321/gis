@@ -62,7 +62,7 @@ void GISRecord::parseEntry(std::string entry) {
 
     std::vector<std::string> tokens = GISRecord::splitEntry(entry);
 
-    GISRecord::featureId = std::stoi(tokens[0]); // This is crashing.
+    GISRecord::featureId = std::stoi(tokens[0]);
     GISRecord::featureName = tokens[1];
     GISRecord::featureClass = tokens[2];
     GISRecord::stateAlpha = tokens[3];
@@ -86,7 +86,9 @@ void GISRecord::parseEntry(std::string entry) {
     GISRecord::elevationFeet = tokens[16];
     GISRecord::mapName = tokens[17];
     GISRecord::dateCreated = tokens[18];
-    GISRecord::dateEdited = tokens[19];
+    if (tokens.size() == 20) {
+        GISRecord::dateEdited = tokens[19];
+    }
 };
 
 // Default constructor

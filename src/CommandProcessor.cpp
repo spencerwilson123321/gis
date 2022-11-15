@@ -231,7 +231,7 @@ void CommandProcessor::processSingleCommand(std::string command_string) {
     if (command.getCommandType() == QUIT) {
         logger.log("---------------------------------------------------------------------------\n");
         logger.log("Command " + std::to_string(commandNumber) + ": " + command.getCommandString()+"\n");
-        logger.log("Quitting...");
+        logger.log("Quitting...\n");
         logger.log("---------------------------------------------------------------------------\n");
         exit(0);
     }

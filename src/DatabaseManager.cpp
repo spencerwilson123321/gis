@@ -160,18 +160,166 @@ std::string DatabaseManager::what_is_at(int latitude, int longitude) {
     return output;
 }
 
+bool isStructure(std::string type) {
+    if (type == "Airport") {
+        return true;
+    }
+    if (type == "Bridge") {
+        return true;
+    }
+    if (type == "Building") {
+        return true;
+    }
+    if (type == "Church") {
+        return true;
+    }
+    if (type == "Dam") {
+        return true;
+    }
+    if (type == "Hospital") {
+        return true;
+    }
+    if (type == "Levee") {
+        return true;
+    }
+    if (type == "Park") {
+        return true;
+    }
+    if (type == "Post Office") {
+        return true;
+    }
+    if (type == "School") {
+        return true;
+    }
+    if (type == "Tower") {
+        return true;
+    }
+    if (type == "Tunnel") {
+        return true;
+    }
+    return false;
+}
+
+bool isPop(std::string type) {
+    if (type == "Populated Place") {
+        return true;
+    }
+    return false;
+}
+
+bool isWater(std::string type) {
+    if (type == "Arroyo") {
+        return true;
+    }
+    if (type == "Bay") {
+        return true;
+    }
+    if (type == "Basin") {
+        return true;
+    }
+    if (type == "Bend") {
+        return true;
+    }
+    if (type == "Canal") {
+        return true;
+    }
+    if (type == "Channel") {
+        return true;
+    }
+    if (type == "Falls") {
+        return true;
+    }
+    if (type == "Glacier") {
+        return true;
+    }
+    if (type == "Gut") {
+        return true;
+    }
+    if (type == "Harbor") {
+        return true;
+    }
+    if (type == "Lake") {
+        return true;
+    }
+    if (type == "Rapids") {
+        return true;
+    }
+    if (type == "Reservoir") {
+        return true;
+    }
+    if (type == "Sea") {
+        return true;
+    }
+    if (type == "Spring") {
+        return true;
+    }
+    if (type == "Stream") {
+        return true;
+    }
+    if (type == "Swamp") {
+        return true;
+    }
+    if (type == "Well") {
+        return true;
+    }
+    return false;
+}
+
 std::string DatabaseManager::what_is_in(int latitude, int longitude, int halfHeight, int halfWidth, int longFlag, int filterFlag, std::string filterString) {
     std::string output = "";
+    std::string prepend = "";
+    int numRecordsFound = 0;
     Coordinate coord(latitude, longitude);
     std::vector<int> offsets = quad.searchRegion(quad.root, coord, halfHeight, halfWidth);
     for (int offset : offsets) {
         auto record = pool.retrieveRecord(offset);
-        output += record.featureName + " " + record.stateAlpha + " Lat: " + std::to_string(record.primaryLatitudeDMS) + " Long: " + std::to_string(record.primaryLongitudeDMS) + "\n";
+        if (longFlag == 1) {
+            // More detailed output.
+            numRecordsFound += 1;
+            output += "File Offset: " + std::to_string(offset) + "\n";
+            output += "Feature ID: " + std::to_string(record.featureId) + "\n";
+            output += "Feature Name: " + record.featureName + "\n";
+            output += "Feature Class: " + record.featureClass + "\n";
+            output += "State: " + record.stateAlpha + "\n";
+            output += "County: " + record.countyName + "\n";
+            output += "Longitude: " + std::to_string(record.primaryLongitudeDMS) + "\n";
+            output += "Latitude: " + std::to_string(record.primaryLatitudeDMS) + "\n";
+            output += "Elevation (ft): " + record.elevationFeet + "\n";
+            output += "Map Name: " + record.mapName + "\n";
+            output += "Date Created: " + record.dateCreated + "\n\n";
+        } else if (filterFlag == 1) {
+            // Filter the output.
+            // pop | water | structure
+            if (filterString == "structure") {
+                if (isStructure(record.featureClass)) {
+                    output += std::to_string(offset) + " | " + record.featureName + " " + record.stateAlpha + " Lat: " + std::to_string(record.primaryLatitudeDMS) + " Long: " + std::to_string(record.primaryLongitudeDMS) + "\n";
+                    numRecordsFound += 1;
+                }
+            }
+            if (filterString == "pop") {
+                if (isPop(record.featureClass)) {
+                    output += std::to_string(offset) + " | " + record.featureName + " " + record.stateAlpha + " Lat: " + std::to_string(record.primaryLatitudeDMS) + " Long: " + std::to_string(record.primaryLongitudeDMS) + "\n";
+                    numRecordsFound += 1;
+                }
+            }
+            if (filterString == "water") {
+                if (isWater(record.featureClass)) {
+                    output += std::to_string(offset) + " | " + record.featureName + " " + record.stateAlpha + " Lat: " + std::to_string(record.primaryLatitudeDMS) + " Long: " + std::to_string(record.primaryLongitudeDMS) + "\n";
+                    numRecordsFound += 1;
+                }
+            }
+        } else {
+            // Regular output.
+            output += std::to_string(offset) + " | " + record.featureName + " " + record.stateAlpha + " Lat: " + std::to_string(record.primaryLatitudeDMS) + " Long: " + std::to_string(record.primaryLongitudeDMS) + "\n";
+            numRecordsFound += 1;
+        }
     }
     if (offsets.size() == 0) {
         output += "No records found!\n";
+    }  else {
+        prepend = std::to_string(numRecordsFound) + " records found!\n\n";
     }
-    return output;
+    return prepend + output;
 };
 
 
