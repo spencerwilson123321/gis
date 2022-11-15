@@ -157,25 +157,25 @@ bool Hashtable::search(std::string key) {
     if (bucketStatus[index] == EMPTY) {
         return false;
     }
-    if (bucketStatus[index] == DELETED) {
-        if (buckets[index].first == key) {
-            return false;
-        }
-        int n = 1;
-        int alpha = 0;
-        while (true) {
-            alpha = ((n*n)+n)/2;
-            alpha = (index + alpha) % buckets.size();
-            if (bucketStatus[alpha] == EMPTY) {
-                // If this bucket is truly empty, then the value won't be in the list.
-                return false;
-            }
-            if (bucketStatus[alpha] == OCCUPIED && buckets[alpha].first == key) {
-                return true;
-            }
-            n = n + 1;
-        }
-    }
+    // if (bucketStatus[index] == DELETED) {
+    //     if (buckets[index].first == key) {
+    //         return false;
+    //     }
+    //     int n = 1;
+    //     int alpha = 0;
+    //     while (true) {
+    //         alpha = ((n*n)+n)/2;
+    //         alpha = (index + alpha) % buckets.size();
+    //         if (bucketStatus[alpha] == EMPTY) {
+    //             // If this bucket is truly empty, then the value won't be in the list.
+    //             return false;
+    //         }
+    //         if (bucketStatus[alpha] == OCCUPIED && buckets[alpha].first == key) {
+    //             return true;
+    //         }
+    //         n = n + 1;
+    //     }
+    // }
     return false;
 };
 

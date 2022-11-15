@@ -94,7 +94,7 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
             node->bucket.push_back(std::make_pair(coordinates, offset));
             numInsertions += 1;
         } else {
-            numInsertions -= 5;
+            numInsertions -= BUCKETSIZE;
             node->bucketNode = false;
             // Calculate new quadrants.
             node->NW = new Node();
