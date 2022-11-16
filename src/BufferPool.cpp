@@ -85,7 +85,7 @@ std::string BufferPool::readFromDatabase(int offset) {
         exit(1);
     }
     db.seekg(db.beg);
-    for (int i = 0; i < offset-2; ++i) {
+    for (int i = 1; i < offset; ++i) {
         db.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
     }
     std::getline(db, entry);

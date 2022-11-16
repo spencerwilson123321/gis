@@ -9,8 +9,9 @@ class Coordinate {
 };
 
 struct Node {
-    Node(): bucketNode(true), NW(nullptr), NE(nullptr), SW(nullptr), SE(nullptr) {};
+    Node(): bucketNode(true), maxPartitions(false), NW(nullptr), NE(nullptr), SW(nullptr), SE(nullptr) {};
     bool bucketNode;
+    bool maxPartitions;
     int eastLongitude; // Expressed in seconds.
     int westLongitude; // Expressed in seconds.
     int northLatitude; // Expressed in seconds.

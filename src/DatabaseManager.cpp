@@ -383,6 +383,7 @@ std::string DatabaseManager::importRecords(std::string path) {
                     hash.add(featureNamestateAbbreviation, offset);
                     Coordinate coords(record.primaryLatitudeDMS, record.primaryLongitudeDMS);
                     quad.insert(quad.root, coords, offset);
+                    offset += 1;
                 } else {
                     numOutOfBounds += 1;
                     numDroppedEntries += 1;
@@ -391,7 +392,6 @@ std::string DatabaseManager::importRecords(std::string path) {
                 // Ignore the entry if it is missing DMS coordinates.
                 numDroppedEntries += 1;
             }
-            offset += 1;
         }
         output += "Number of dropped entries: " + std::to_string(numDroppedEntries) + "\n";
         output += "Number of added entries: " + std::to_string(numAddedEntries) + "\n";

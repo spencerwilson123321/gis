@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#define BUCKETSIZE 150
+#define BUCKETSIZE 5
 
 // ------------------- CONSTRUCTORS ------------------------
 
@@ -27,6 +27,7 @@ BucketQuadTree::BucketQuadTree(Node *node) {
     root->SW = nullptr;
     root->SE = nullptr;
     root->bucketNode = true;
+    root->maxPartitions = false;
     numInsertions = 0;
     numOutOfBounds = 0;
 };
@@ -49,8 +50,27 @@ int calculateHeight(Node *node) {
     return max_height + 1;
 }
 
+int calculateNumElements(Node* node) {
+    if (node == nullptr) {
+        return 0;
+    }
+
+    if (node->bucketNode) {
+        if (node->bucket.size() > BUCKETSIZE) {
+        }
+        return node->bucket.size();
+    }
+
+    int numElementsNW = calculateNumElements(node->NW);
+    int numElementsNE = calculateNumElements(node->NE);
+    int numElementsSW = calculateNumElements(node->SW);
+    int numElementsSE = calculateNumElements(node->SE);
+
+    return numElementsNE + numElementsNW + numElementsSE + numElementsSW;
+}
+
 bool BucketQuadTree::isBucketFull(Node* node) {
-    return (node->bucket.size() == BUCKETSIZE);
+    return (node->bucket.size() > BUCKETSIZE);
 }
 
 bool BucketQuadTree::isBucketNode(Node *node) {
@@ -58,10 +78,18 @@ bool BucketQuadTree::isBucketNode(Node *node) {
 }
 
 bool BucketQuadTree::inBounds(Node* node, Coordinate coords) {
-    return (coords.latitude <= node->northLatitude
+    // std::cout << "Coordinate Latitude: " << coords.latitude << std::endl;
+    // std::cout << "Coordinate Longitude: " << coords.longitude << std::endl;
+    // std::cout << "Node Boundary North Latitude: " << node->northLatitude << std::endl;
+    // std::cout << "Node Boundary South Latitude: " << node->southLatitude << std::endl;
+    // std::cout << "Node Boundary East Longitude: " << node->eastLongitude << std::endl;
+    // std::cout << "Node Boundary West Longitude: " << node->westLongitude << std::endl;
+    bool result = (coords.latitude <= node->northLatitude
          && coords.latitude >= node->southLatitude
          && coords.longitude >= node->westLongitude
          && coords.longitude <= node->eastLongitude);
+    // std::cout << "In Bounds? " << result << std::endl;
+    return result;
 }
 
 void BucketQuadTree::setBoundaries(Node* node, int w, int e, int n, int s) {
@@ -80,27 +108,38 @@ void BucketQuadTree::setRootBoundaries(int w, int e, int n, int s) {
 
 void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
 
-    // std::cout << "Coordinates: " << "Lat-> " << coordinates.latitude << " Long-> " << coordinates.longitude << std::endl;
-    // std::cout << "File offset: " << offset << std::endl;
-
     // If the coordinate isn't in bounds,
     // then it cannot be placed in this tree.
     if (!inBounds(node, coordinates)) {
-        numOutOfBounds += 1;
         return;
     }
 
     if (isBucketNode(node)) {
-        // If this is a bucket node we can potentially insert it here.
-        // Must check if the bucket is full.
+
         if (!isBucketFull(node)) {
-            // std::cout << "Num Insertions: " << numInsertions << std::endl;
-            numInsertions += 1;
             node->bucket.push_back(std::make_pair(coordinates, offset));
         } else {
-            // std::cout << "Bucket Full!\n";
-            numInsertions -= BUCKETSIZE;
+
+
+            if (node->maxPartitions) { // We cannot split the region any further.
+                node->bucket.push_back(std::make_pair(coordinates, offset));
+                return;
+            }
+
+
+            if (
+                ((node->eastLongitude - node->westLongitude) == 1) 
+             && ((node->northLatitude - node->southLatitude) == 1)
+             )
+            {
+                node->maxPartitions = true;
+                node->bucket.push_back(std::make_pair(coordinates, offset));
+                return;
+            }
+
+
             node->bucketNode = false;
+            // numInsertions -= BUCKETSIZE;
             // Calculate new quadrants.
             node->NW = new Node();
             node->SW = new Node();
@@ -136,32 +175,31 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
             );
             node->bucket.push_back(std::make_pair(coordinates, offset));
             for (auto pair : node->bucket) {
-                // This is where the bug is occuring.
-                // std::cout << "Coordinates Lat --> " << pair.first.latitude << "\n";
-                // std::cout << "Coordinates Long --> " << pair.first.longitude << "\n";
-                // std::cout << "Node East Long --> " << node->eastLongitude << "\n";
-                // std::cout << "Node West Long --> " << node->westLongitude << "\n";
-                // std::cout << "Node North Lat --> " << node->northLatitude << "\n";
-                // std::cout << "Node South Lat --> " << node->southLatitude << "\n";
-
                 if (inBounds(node->NW, pair.first)) {
                     insert(node->NW, pair.first, pair.second);
+                    // node->NW->bucket.push_back(pair);
+                    continue;
                 }
                 if (inBounds(node->SW, pair.first)) {
-                    insert(node->SW, pair.first, pair.second);
+                   insert(node->SW, pair.first, pair.second);
+                    // node->SW->bucket.push_back(pair);
+                    continue;
                 }
                 if (inBounds(node->NE, pair.first)) {
                     insert(node->NE, pair.first, pair.second);
+                    // node->NE->bucket.push_back(pair);
+                    continue;
                 }
                 if (inBounds(node->SE, pair.first)) {
                     insert(node->SE, pair.first, pair.second);
+                    // node->SE->bucket.push_back(pair);
+                    continue;
                 }
             }
             node->bucket.clear();
         }
     } else {
         // We need to traverse the tree.
-        // Possibly calculate which subquadrant it is in.
         if (inBounds(node->NW, coordinates)) {
             insert(node->NW, coordinates, offset);
             return;
@@ -312,8 +350,8 @@ std::string BucketQuadTree::treeToString(Node* node, std::string prefix) {
 std::string BucketQuadTree::debug() {
     std::string output = "";
     int height = calculateHeight(root);
-    output += "Number of Elements in Quad Tree: " + std::to_string(numInsertions) + "\n"; 
-    output += "Number of Elements out of bounds: " + std::to_string(numOutOfBounds) + "\n";
+    int numElements = calculateNumElements(root);
+    output += "Number of Elements in Quad Tree: " + std::to_string(numElements) + "\n"; 
     output += "Height of the Quad Tree: " + std::to_string(height) + "\n";
     output += "Legend:\n";
     output += "N = non-bucket node\n";
