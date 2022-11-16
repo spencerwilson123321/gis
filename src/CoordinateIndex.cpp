@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#define BUCKETSIZE 500
+#define BUCKETSIZE 150
 
 // ------------------- CONSTRUCTORS ------------------------
 
@@ -94,11 +94,11 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
         // If this is a bucket node we can potentially insert it here.
         // Must check if the bucket is full.
         if (!isBucketFull(node)) {
-            std::cout << "Num Insertions: " << numInsertions << std::endl;
+            // std::cout << "Num Insertions: " << numInsertions << std::endl;
             numInsertions += 1;
             node->bucket.push_back(std::make_pair(coordinates, offset));
         } else {
-            std::cout << "Bucket Full!\n";
+            // std::cout << "Bucket Full!\n";
             numInsertions -= BUCKETSIZE;
             node->bucketNode = false;
             // Calculate new quadrants.
@@ -137,12 +137,12 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
             node->bucket.push_back(std::make_pair(coordinates, offset));
             for (auto pair : node->bucket) {
                 // This is where the bug is occuring.
-                std::cout << "Coordinates Lat --> " << pair.first.latitude << "\n";
-                std::cout << "Coordinates Long --> " << pair.first.longitude << "\n";
-                std::cout << "Node East Long --> " << node->eastLongitude << "\n";
-                std::cout << "Node West Long --> " << node->westLongitude << "\n";
-                std::cout << "Node North Lat --> " << node->northLatitude << "\n";
-                std::cout << "Node South Lat --> " << node->southLatitude << "\n";
+                // std::cout << "Coordinates Lat --> " << pair.first.latitude << "\n";
+                // std::cout << "Coordinates Long --> " << pair.first.longitude << "\n";
+                // std::cout << "Node East Long --> " << node->eastLongitude << "\n";
+                // std::cout << "Node West Long --> " << node->westLongitude << "\n";
+                // std::cout << "Node North Lat --> " << node->northLatitude << "\n";
+                // std::cout << "Node South Lat --> " << node->southLatitude << "\n";
 
                 if (inBounds(node->NW, pair.first)) {
                     insert(node->NW, pair.first, pair.second);
