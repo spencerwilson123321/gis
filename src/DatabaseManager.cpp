@@ -14,6 +14,11 @@
 #include "../include/NameIndex.h"
 #endif
 
+#ifndef COORDINATEINDEX
+#define COORDINATEINDEX
+#include "../include/CoordinateIndex.h"
+#endif
+
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
@@ -334,8 +339,8 @@ std::string DatabaseManager::importRecords(std::string path) {
     DatabaseManager::hash.initializeTable(1024);
     database_file.open(db_filepath, std::ios::app);
     import_file.open(path, std::ios::in);
-    int first_line = 1;
-    int offset = 0;
+    bool first_line = true;
+    int offset = 1;
     if (import_file.is_open() && database_file.is_open()) {
         int numDroppedEntries = 0;
         int numAddedEntries = 0;
@@ -343,8 +348,8 @@ std::string DatabaseManager::importRecords(std::string path) {
         int numInBounds = 0;
         while (std::getline(import_file, buffer)) {
             if (first_line) {
-                first_line = 0;
-                offset += 1;
+                first_line = false;
+                // offset += 1;
                 continue;
             }
             // Calculate the file offset. This will
@@ -365,6 +370,7 @@ std::string DatabaseManager::importRecords(std::string path) {
                     numAddedEntries += 1;
                     numInBounds += 1;
                     database_file << buffer << std::endl;
+                    buffer = "";
                     // Now we must fill out the data structures.
                     // 1. Fill out the hash table.
                     if (record.featureName == "" || record.stateAlpha == "") {
@@ -397,20 +403,16 @@ std::string DatabaseManager::importRecords(std::string path) {
     // There is a bug where the newline at the end of the database file crashes
     // the program. To make sure that doesn't happen we have to read the database file again.
     // and remove the newline at the end.
-    std::ifstream fileIn(db_filepath);
-    std::stringstream streamBuffer;
-    std::string contents;
-    if (!fileIn.is_open()) {
-        std::cout << "Failed to open database file when trying to remove trailing newline.\n";
-        exit(1);
-    };
-    streamBuffer << fileIn.rdbuf();
-    contents = streamBuffer.str();
-    contents.pop_back();
-    fileIn.close();
-    std::ofstream fileOut(db_filepath, std::ios::trunc);
-    fileOut << contents;
-    fileOut.close();
+    std::ifstream file(db_filepath);
+    std::string buff(std::istreambuf_iterator<char>{file},
+                   std::istreambuf_iterator<char>{});
+    while (!buff.empty() && std::isspace(buff.back())) {
+        buff.pop_back();
+    }
+    file.close();
+    std::ofstream f(db_filepath, std::ios::trunc);
+    f << buff;
+    f.close();
     return output;
 }
 

@@ -1,7 +1,7 @@
 #define BUFFERPOOL 1
 #include "../include/BufferPool.h"
 
-#define CACHE_SIZE 16
+#define CACHE_SIZE 15
 #include <iostream>
 #include <fstream>
 #include <limits>

@@ -1,7 +1,6 @@
 #include <vector>
 #include <string>
 #include <list>
-#include <map>
 #ifndef GISRECORD
 #define GISRECORD
 #include "../include/GISRecord.h"

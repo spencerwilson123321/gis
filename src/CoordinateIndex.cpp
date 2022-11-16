@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#define BUCKETSIZE 5
+#define BUCKETSIZE 500
 
 // ------------------- CONSTRUCTORS ------------------------
 
@@ -80,6 +80,9 @@ void BucketQuadTree::setRootBoundaries(int w, int e, int n, int s) {
 
 void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
 
+    // std::cout << "Coordinates: " << "Lat-> " << coordinates.latitude << " Long-> " << coordinates.longitude << std::endl;
+    // std::cout << "File offset: " << offset << std::endl;
+
     // If the coordinate isn't in bounds,
     // then it cannot be placed in this tree.
     if (!inBounds(node, coordinates)) {
@@ -91,9 +94,11 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
         // If this is a bucket node we can potentially insert it here.
         // Must check if the bucket is full.
         if (!isBucketFull(node)) {
-            node->bucket.push_back(std::make_pair(coordinates, offset));
+            std::cout << "Num Insertions: " << numInsertions << std::endl;
             numInsertions += 1;
+            node->bucket.push_back(std::make_pair(coordinates, offset));
         } else {
+            std::cout << "Bucket Full!\n";
             numInsertions -= BUCKETSIZE;
             node->bucketNode = false;
             // Calculate new quadrants.
@@ -131,21 +136,25 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
             );
             node->bucket.push_back(std::make_pair(coordinates, offset));
             for (auto pair : node->bucket) {
+                // This is where the bug is occuring.
+                std::cout << "Coordinates Lat --> " << pair.first.latitude << "\n";
+                std::cout << "Coordinates Long --> " << pair.first.longitude << "\n";
+                std::cout << "Node East Long --> " << node->eastLongitude << "\n";
+                std::cout << "Node West Long --> " << node->westLongitude << "\n";
+                std::cout << "Node North Lat --> " << node->northLatitude << "\n";
+                std::cout << "Node South Lat --> " << node->southLatitude << "\n";
+
                 if (inBounds(node->NW, pair.first)) {
                     insert(node->NW, pair.first, pair.second);
-                    continue;
                 }
                 if (inBounds(node->SW, pair.first)) {
                     insert(node->SW, pair.first, pair.second);
-                    continue;
                 }
                 if (inBounds(node->NE, pair.first)) {
                     insert(node->NE, pair.first, pair.second);
-                    continue;
                 }
                 if (inBounds(node->SE, pair.first)) {
                     insert(node->SE, pair.first, pair.second);
-                    continue;
                 }
             }
             node->bucket.clear();
@@ -202,7 +211,6 @@ std::vector<int> BucketQuadTree::search(Node* node, Coordinate coord) {
     return offsets;
 };
 
-// TODO
 bool BucketQuadTree::inBoundsRegion(Coordinate topRight, Coordinate topLeft, Coordinate botRight, Coordinate botLeft, Coordinate coordinate) {
     int northLat = topRight.latitude;
     int southLat = botRight.latitude;
@@ -219,14 +227,6 @@ bool BucketQuadTree::checkIfOverlap(Node* node, Coordinate topRight, Coordinate 
     int southLat = botRight.latitude;
     int eastLong = topRight.longitude;
     int westLong = topLeft.longitude;
-    // std::cout << "Region North Lat: " << northLat << std::endl;
-    // std::cout << "Region South Lat: " << southLat << std::endl;
-    // std::cout << "Region East Long: " << eastLong << std::endl;
-    // std::cout << "Region West Long: " << westLong << std::endl;
-    // std::cout << "Node North Lat: " << node->northLatitude << std::endl;
-    // std::cout << "Node South Lat: " << node->southLatitude << std::endl;
-    // std::cout << "Node East Long: " << node->eastLongitude << std::endl;
-    // std::cout << "Node West Long: " << node->westLongitude << std::endl;
     return (node->northLatitude >= southLat
          && node->southLatitude <= northLat
          && node->eastLongitude >= westLong
