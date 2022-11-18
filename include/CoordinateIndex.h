@@ -16,7 +16,7 @@ struct Node {
     int westLongitude; // Expressed in seconds.
     int northLatitude; // Expressed in seconds.
     int southLatitude; // Expressed in seconds.
-    std::vector<std::pair<Coordinate, int>> bucket;
+    std::vector<std::pair<Coordinate, std::vector<int>>> bucket;
     Node* NW;
     Node* NE;
     Node* SW;

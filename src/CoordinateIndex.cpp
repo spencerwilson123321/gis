@@ -56,21 +56,21 @@ int calculateNumElements(Node* node) {
     }
 
     if (node->bucketNode) {
-        if (node->bucket.size() > BUCKETSIZE) {
+        int sum = 0;
+        for (auto pair : node->bucket) {
+            sum += pair.second.size();
         }
-        return node->bucket.size();
+        return sum;
     }
-
     int numElementsNW = calculateNumElements(node->NW);
     int numElementsNE = calculateNumElements(node->NE);
     int numElementsSW = calculateNumElements(node->SW);
     int numElementsSE = calculateNumElements(node->SE);
-
     return numElementsNE + numElementsNW + numElementsSE + numElementsSW;
 }
 
 bool BucketQuadTree::isBucketFull(Node* node) {
-    return (node->bucket.size() > BUCKETSIZE);
+    return (node->bucket.size() >= BUCKETSIZE);
 }
 
 bool BucketQuadTree::isBucketNode(Node *node) {
@@ -78,17 +78,10 @@ bool BucketQuadTree::isBucketNode(Node *node) {
 }
 
 bool BucketQuadTree::inBounds(Node* node, Coordinate coords) {
-    // std::cout << "Coordinate Latitude: " << coords.latitude << std::endl;
-    // std::cout << "Coordinate Longitude: " << coords.longitude << std::endl;
-    // std::cout << "Node Boundary North Latitude: " << node->northLatitude << std::endl;
-    // std::cout << "Node Boundary South Latitude: " << node->southLatitude << std::endl;
-    // std::cout << "Node Boundary East Longitude: " << node->eastLongitude << std::endl;
-    // std::cout << "Node Boundary West Longitude: " << node->westLongitude << std::endl;
     bool result = (coords.latitude <= node->northLatitude
          && coords.latitude >= node->southLatitude
          && coords.longitude >= node->westLongitude
          && coords.longitude <= node->eastLongitude);
-    // std::cout << "In Bounds? " << result << std::endl;
     return result;
 }
 
@@ -115,88 +108,85 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
     }
 
     if (isBucketNode(node)) {
-
-        if (!isBucketFull(node)) {
-            node->bucket.push_back(std::make_pair(coordinates, offset));
-        } else {
-
-
-            if (node->maxPartitions) { // We cannot split the region any further.
-                node->bucket.push_back(std::make_pair(coordinates, offset));
-                return;
+        // Check if the coordinate matches one already in the bucket.
+        bool match = false;
+        for (int i = 0; i < node->bucket.size(); i++) {
+            if (node->bucket[i].first.latitude == coordinates.latitude && node->bucket[i].first.longitude == coordinates.longitude) {
+                match = true;
+                node->bucket[i].second.push_back(offset);
             }
-
-
-            if (
-                ((node->eastLongitude - node->westLongitude) == 1) 
-             && ((node->northLatitude - node->southLatitude) == 1)
-             )
-            {
-                node->maxPartitions = true;
-                node->bucket.push_back(std::make_pair(coordinates, offset));
-                return;
+        }
+        // If no match, then we need to create a new coordinate index.
+        // But first check that the bucket isn't already full.
+        if (!match) {
+            if (!isBucketFull(node)) { // If the bucket isn't full, then add the new entry and all is good.
+                std::vector<int> offsets;
+                offsets.push_back(offset);
+                node->bucket.push_back(std::make_pair(coordinates, offsets));
+            } else  { // If the bucket is full, then we need to create new subregions and move everything into those subregions.
+                node->bucketNode = false;
+                node->NW = new Node();
+                node->SW = new Node();
+                node->SE = new Node();
+                node->NE = new Node();
+                setBoundaries(
+                    node->NW,
+                    node->westLongitude,
+                    (node->eastLongitude - (node->eastLongitude-node->westLongitude)/2),
+                    node->northLatitude,
+                    (node->southLatitude + (node->northLatitude - node->southLatitude)/2) 
+                );
+                setBoundaries(
+                    node->NE,
+                    (node->westLongitude + (node->eastLongitude - node->westLongitude)/2),
+                    node->eastLongitude,
+                    node->northLatitude,
+                    (node->southLatitude + (node->northLatitude - node->southLatitude)/2)
+                );
+                setBoundaries(
+                    node->SW,
+                    node->westLongitude,
+                    (node->eastLongitude - (node->eastLongitude - node->westLongitude)/2),
+                    (node->northLatitude - (node->northLatitude - node->southLatitude)/2),
+                    node->southLatitude
+                );
+                setBoundaries(
+                    node->SE,
+                    (node->westLongitude + (node->eastLongitude - node->westLongitude)/2),
+                    node->eastLongitude,
+                    (node->northLatitude - (node->northLatitude - node->southLatitude)/2),
+                    node->southLatitude
+                );
+                // Get all the offsets and coordinates into a list of pairs, then iterate the list of pairs
+                // and insert each one into the corresponding subregion.
+                // 1. Create a vector of pair<Coordinate, int> for each coordinate and offset.
+                std::vector<std::pair<Coordinate, int>> tempVector;
+                for (auto pair : node->bucket) {
+                    for (int ofst : pair.second) {
+                        tempVector.push_back(std::make_pair(pair.first, ofst));
+                    }
+                }
+                tempVector.push_back(std::make_pair(coordinates, offset)); // Make sure we add the current coordinate,offset pair.
+                for (auto pair : tempVector) {
+                    if (inBounds(node->NW, pair.first)) {
+                        insert(node->NW, pair.first, pair.second);
+                        continue;
+                    }
+                    if (inBounds(node->SW, pair.first)) {
+                        insert(node->SW, pair.first, pair.second);
+                        continue;
+                    }
+                    if (inBounds(node->NE, pair.first)) {
+                        insert(node->NE, pair.first, pair.second);
+                        continue;
+                    }
+                    if (inBounds(node->SE, pair.first)) {
+                        insert(node->SE, pair.first, pair.second);
+                        continue;
+                    }
+                }
+                node->bucket.clear();
             }
-
-
-            node->bucketNode = false;
-            // numInsertions -= BUCKETSIZE;
-            // Calculate new quadrants.
-            node->NW = new Node();
-            node->SW = new Node();
-            node->SE = new Node();
-            node->NE = new Node();
-            setBoundaries( // Done
-                node->NW,
-                node->westLongitude,
-                (node->eastLongitude - (node->eastLongitude-node->westLongitude)/2),
-                node->northLatitude,
-                (node->southLatitude + (node->northLatitude - node->southLatitude)/2) 
-            );
-            setBoundaries(
-                node->NE,
-                (node->westLongitude + (node->eastLongitude - node->westLongitude)/2),
-                node->eastLongitude,
-                node->northLatitude,
-                (node->southLatitude + (node->northLatitude - node->southLatitude)/2)
-            );
-            setBoundaries( // Done
-                node->SW,
-                node->westLongitude,
-                (node->eastLongitude - (node->eastLongitude - node->westLongitude)/2),
-                (node->northLatitude - (node->northLatitude - node->southLatitude)/2),
-                node->southLatitude
-            );
-            setBoundaries(
-                node->SE,
-                (node->westLongitude + (node->eastLongitude - node->westLongitude)/2),
-                node->eastLongitude,
-                (node->northLatitude - (node->northLatitude - node->southLatitude)/2),
-                node->southLatitude
-            );
-            node->bucket.push_back(std::make_pair(coordinates, offset));
-            for (auto pair : node->bucket) {
-                if (inBounds(node->NW, pair.first)) {
-                    insert(node->NW, pair.first, pair.second);
-                    // node->NW->bucket.push_back(pair);
-                    continue;
-                }
-                if (inBounds(node->SW, pair.first)) {
-                   insert(node->SW, pair.first, pair.second);
-                    // node->SW->bucket.push_back(pair);
-                    continue;
-                }
-                if (inBounds(node->NE, pair.first)) {
-                    insert(node->NE, pair.first, pair.second);
-                    // node->NE->bucket.push_back(pair);
-                    continue;
-                }
-                if (inBounds(node->SE, pair.first)) {
-                    insert(node->SE, pair.first, pair.second);
-                    // node->SE->bucket.push_back(pair);
-                    continue;
-                }
-            }
-            node->bucket.clear();
         }
     } else {
         // We need to traverse the tree.
@@ -217,7 +207,7 @@ void BucketQuadTree::insert(Node* node, Coordinate coordinates, int offset) {
             return;
         }
     }
-};
+}
 
 std::vector<int> BucketQuadTree::search(Node* node, Coordinate coord) {
     std::vector<int> offsets;
@@ -228,7 +218,10 @@ std::vector<int> BucketQuadTree::search(Node* node, Coordinate coord) {
         // Check if there are coordinates matching our search coordinates.
         for (auto pair : node->bucket) {
             if (pair.first.latitude == coord.latitude && pair.first.longitude == coord.longitude) {
-                offsets.push_back(pair.second);
+                // Coordinates match, add every offset for this coordinate index.
+                for (int o : pair.second) {
+                    offsets.push_back(o);
+                }
             }
         }
         return offsets;
@@ -258,7 +251,7 @@ bool BucketQuadTree::inBoundsRegion(Coordinate topRight, Coordinate topLeft, Coo
          && coordinate.latitude <= northLat
          && coordinate.longitude >= westLat
          && coordinate.longitude <= eastLat);
-}
+};
 
 bool BucketQuadTree::checkIfOverlap(Node* node, Coordinate topRight, Coordinate topLeft, Coordinate botRight, Coordinate botLeft) {
     int northLat = topRight.latitude;
@@ -299,7 +292,10 @@ std::vector<int> BucketQuadTree::searchRegion(Node* node, Coordinate coord, int 
         // of the region being searched.
         for (auto pair : node->bucket) {
             if (inBoundsRegion(topRight, topLeft, botRight, botLeft, pair.first)) {
-                offsets.push_back(pair.second);
+                // offsets.push_back(pair.second);
+                for (int o : pair.second) {
+                    offsets.push_back(o);
+                }
             }
         }
         return offsets;
@@ -337,7 +333,9 @@ std::string BucketQuadTree::treeToString(Node* node, std::string prefix) {
     output += prefix + value + "\n";
     if (node->bucketNode) {
         for (auto pair : node->bucket) {
-            output += prefix + " Lat: " + std::to_string(pair.first.latitude) + " Long: " + std::to_string(pair.first.longitude) + " File Offset: " + std::to_string(pair.second) + "\n";
+            for (auto o : pair.second) {
+                output += prefix + " Lat: " + std::to_string(pair.first.latitude) + " Long: " + std::to_string(pair.first.longitude) + " File Offset: " + std::to_string(o) + "\n";
+            }
         }
     }
     output += treeToString(node->NW, prefix+"   ");
