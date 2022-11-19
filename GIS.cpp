@@ -4,7 +4,7 @@
 #include <ctime>
 
 #ifndef COMMANDPROCESSOR
-#include "../include/CommandProcessor.h"
+#include "./include/CommandProcessor.h"
 #endif
 
 int main(int argc, const char **argv) {
