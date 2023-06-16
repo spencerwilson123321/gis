@@ -1,4 +1,4 @@
-# gis
+# Geographical Information System (GIS)
 A Geographical Information System (GIS) implemented in C++ as part of COMP 8047 at BCIT. A geographical information system processes geographical data so that it can be efficiently queried and utilized. This particular application uses a custom PR Bucket QuadTree implementation as well as a custom hash table implementation using quadratic probing to index the geographical data. Once the data is indexed, the user uses a "command file" to issue queries to the indexed data and the application quickly and efficiently returns the results.
 
 # Compile (Linux)
